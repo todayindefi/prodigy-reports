@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy Twitter Report — Mar 3-8, 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f14; color: #e0e0e6; line-height: 1.6; padding: 40px 20px; }
+  .container { max-width: 800px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid #2a2a35; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .header .subtitle { font-size: 14px; color: #888; letter-spacing: 1px; text-transform: uppercase; }
+  .header .date-range { font-size: 18px; color: #a78bfa; margin-top: 8px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; }
+  .kpi { background: #1a1a24; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #2a2a35; }
+  .kpi .value { font-size: 32px; font-weight: 700; color: #fff; }
+  .kpi .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .kpi .delta { font-size: 13px; margin-top: 6px; }
+  .kpi .delta.up { color: #4ade80; }
+  .kpi .delta.down { color: #f87171; }
+  .kpi .delta.neutral { color: #888; }
+
+  h2 { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid #a78bfa; display: inline-block; }
+  .section { margin-bottom: 48px; }
+
+  .insight-list { list-style: none; }
+  .insight-list li { padding: 14px 16px; background: #1a1a24; border-radius: 10px; margin-bottom: 10px; border-left: 3px solid #a78bfa; }
+  .insight-list li.green { border-left-color: #4ade80; }
+  .insight-list li.red { border-left-color: #f87171; }
+  .insight-list li strong { color: #fff; }
+  .insight-list li .metric { color: #a78bfa; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th { text-align: left; padding: 10px 12px; color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #2a2a35; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #1f1f2a; }
+  tbody tr:hover { background: #1a1a24; }
+  .highlight-row { background: #1a1a24; }
+  .highlight-row td { color: #fff; font-weight: 500; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .best { color: #4ade80; font-weight: 600; }
+
+  .top-tweets { margin-top: 12px; }
+  .tweet-card { background: #1a1a24; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; border: 1px solid #2a2a35; }
+  .tweet-card .tweet-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .tweet-card .tweet-date { font-size: 12px; color: #888; }
+  .tweet-card .tweet-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge-top { background: #4ade8020; color: #4ade80; }
+  .badge-thread { background: #a78bfa20; color: #a78bfa; }
+  .tweet-card .tweet-text { font-size: 15px; color: #d0d0d8; margin-bottom: 14px; }
+  .tweet-card .tweet-stats { display: flex; gap: 20px; font-size: 13px; color: #888; }
+  .tweet-card .tweet-stats span strong { color: #fff; }
+
+  .callout { background: linear-gradient(135deg, #1a1a24, #1f1a2e); border: 1px solid #a78bfa40; border-radius: 12px; padding: 24px; margin-top: 12px; }
+  .callout h3 { color: #a78bfa; font-size: 16px; margin-bottom: 10px; }
+  .callout p { font-size: 14px; color: #c0c0c8; }
+
+  .footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #2a2a35; font-size: 12px; color: #555; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="subtitle">Twitter Performance Report</div>
+    <h1>Prodigy.fi (@ProdigyFi)</h1>
+    <div class="date-range">March 3 &ndash; 8, 2026</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">1,650</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+27% vs prior week</div>
+    </div>
+    <div class="kpi">
+      <div class="value">7.64%</div>
+      <div class="label">Engagement Rate</div>
+      <div class="delta down">-3.05pp vs prior week</div>
+    </div>
+    <div class="kpi">
+      <div class="value">150</div>
+      <div class="label">Avg Imp / Tweet</div>
+      <div class="delta up">+61% vs prior week</div>
+    </div>
+    <div class="kpi">
+      <div class="value">11</div>
+      <div class="label">Reposts</div>
+      <div class="delta up">Best in 4 weeks</div>
+    </div>
+  </div>
+
+  <!-- What Went Well -->
+  <div class="section">
+    <h2>What Went Well</h2>
+    <ul class="insight-list">
+      <li class="green">
+        <strong>Opinion &amp; meme tweets dominated.</strong> The "leverage is expensive insurance" take hit <span class="metric">18.18% engagement rate</span> and the Dr. ProdigyFi meme hit <span class="metric">15.2%</span> &mdash; both far above the week's 7.64% average. Short, personality-driven content is the top-performing format.
+      </li>
+      <li class="green">
+        <strong>Referral program thread carried reach.</strong> The head tweet alone pulled <span class="metric">780 impressions</span> &mdash; nearly half the week's total. Product news still gets distributed when it's genuinely new.
+      </li>
+      <li class="green">
+        <strong>Best avg impressions per tweet in 2 weeks.</strong> At <span class="metric">150 avg imp/tweet</span>, up from 93 the prior week. Content quality is translating to better per-post reach.
+      </li>
+      <li class="green">
+        <strong>URL clicks trending up.</strong> <span class="metric">0.30% CTR</span> vs 0.06% two weeks ago. Still low in absolute terms but directionally right.
+      </li>
+    </ul>
+  </div>
+
+  <!-- What Could Be Improved -->
+  <div class="section">
+    <h2>What Could Be Improved</h2>
+    <ul class="insight-list">
+      <li class="red">
+        <strong>Community reply engagement dropped to zero.</strong> Feb 10-16 had 99 replies, Feb 17-23 had 73 &mdash; this week had none. Those reply-heavy weeks had the highest avg impressions on original tweets (280 and 172). Reply engagement likely boosts algo visibility and gets the handle in front of new audiences.
+      </li>
+      <li class="red">
+        <strong>Thread CTA tweets are dead weight.</strong> Both "try it here" tweets got <span class="metric">35 and 52 impressions, 0 likes combined</span>. Bare link CTAs get buried by the algorithm. Embed links in substantive tweets or give the CTA tweet real copy.
+      </li>
+      <li class="red">
+        <strong>Only 1 new follower all week.</strong> Engagement is coming from existing audience. No discovery-oriented content (quote-tweeting bigger accounts, trending topic takes, collabs) to attract new followers.
+      </li>
+      <li class="red">
+        <strong>Nearly zero bookmarks.</strong> Content is consumable but not save-worthy. Educational explainers, data visuals, and comparison threads tend to get bookmarked and have longer shelf life.
+      </li>
+    </ul>
+  </div>
+
+  <!-- Week-over-Week Comparison -->
+  <div class="section">
+    <h2>Week-over-Week Comparison</h2>
+    <p style="font-size: 13px; color: #888; margin-bottom: 16px;">Original tweets only &mdash; replies to other accounts excluded.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th class="num">Mar 3-8</th>
+          <th class="num">Feb 24-Mar 2</th>
+          <th class="num">Feb 17-23</th>
+          <th class="num">Feb 10-16</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td>Original tweets</td>
+          <td class="num">11</td>
+          <td class="num">14</td>
+          <td class="num">9</td>
+          <td class="num">17</td>
+        </tr>
+        <tr>
+          <td>Reply tweets</td>
+          <td class="num">0</td>
+          <td class="num">1</td>
+          <td class="num">73</td>
+          <td class="num">99</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>Impressions</td>
+          <td class="num">1,650</td>
+          <td class="num">1,300</td>
+          <td class="num">1,552</td>
+          <td class="num best">4,756</td>
+        </tr>
+        <tr>
+          <td>Avg imp / tweet</td>
+          <td class="num">150</td>
+          <td class="num">93</td>
+          <td class="num">172</td>
+          <td class="num best">280</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>Likes</td>
+          <td class="num best">36</td>
+          <td class="num">33</td>
+          <td class="num">24</td>
+          <td class="num">80</td>
+        </tr>
+        <tr>
+          <td>Reposts</td>
+          <td class="num best">11</td>
+          <td class="num">9</td>
+          <td class="num">8</td>
+          <td class="num">19</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>Engagement rate</td>
+          <td class="num">7.64%</td>
+          <td class="num best">10.69%</td>
+          <td class="num">7.22%</td>
+          <td class="num">8.43%</td>
+        </tr>
+        <tr>
+          <td>URL clicks</td>
+          <td class="num">5</td>
+          <td class="num best">6</td>
+          <td class="num">1</td>
+          <td class="num">2</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>New follows</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Top Tweets -->
+  <div class="section">
+    <h2>Top Tweets This Week</h2>
+    <div class="top-tweets">
+
+      <div class="tweet-card">
+        <div class="tweet-meta">
+          <span class="tweet-date">Mar 3 &middot; Thread head</span>
+          <span class="tweet-badge badge-thread">Thread</span>
+        </div>
+        <div class="tweet-text">NEW IN. our referral program just got juicier. we're democratizing structured yields and now, we're democratizing the rewards too. you can now earn up to 30% of protocol fees in rewards...</div>
+        <div class="tweet-stats">
+          <span><strong>780</strong> impressions</span>
+          <span><strong>8</strong> likes</span>
+          <span><strong>40</strong> engagements</span>
+          <span><strong>2</strong> reposts</span>
+          <span><strong>5.13%</strong> eng rate</span>
+        </div>
+      </div>
+
+      <div class="tweet-card">
+        <div class="tweet-meta">
+          <span class="tweet-date">Mar 4 &middot; Standalone</span>
+          <span class="tweet-badge badge-top">Top Engagement</span>
+        </div>
+        <div class="tweet-text">Men will literally watch charts 24/7 instead of going to therapy. Book your next session with Dr. ProdigyFi to ease your anxiety with fixed yields and zero liquidation risk &#x1F9D1;&#x200D;&#x2695;&#xFE0F;</div>
+        <div class="tweet-stats">
+          <span><strong>125</strong> impressions</span>
+          <span><strong>7</strong> likes</span>
+          <span><strong>19</strong> engagements</span>
+          <span><strong>4</strong> reposts</span>
+          <span><strong>15.2%</strong> eng rate</span>
+        </div>
+      </div>
+
+      <div class="tweet-card">
+        <div class="tweet-meta">
+          <span class="tweet-date">Mar 7 &middot; Standalone</span>
+          <span class="tweet-badge badge-top">Highest Eng Rate</span>
+        </div>
+        <div class="tweet-text">leverage is expensive insurance you don't need. a 10% wick liquidates your position. a 5% bounce gets you back in. repeat until you're out of capital. but with prodigy.fi you harvest the unpredictable market without liquidation risk. ~150%+ APY. predictable.</div>
+        <div class="tweet-stats">
+          <span><strong>121</strong> impressions</span>
+          <span><strong>5</strong> likes</span>
+          <span><strong>22</strong> engagements</span>
+          <span><strong>1</strong> bookmark</span>
+          <span><strong>18.18%</strong> eng rate</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Recommendation -->
+  <div class="section">
+    <div class="callout">
+      <h3>Recommendation</h3>
+      <p>
+        Content quality is at its best &mdash; opinion and meme formats are clearly winning. The gap is <strong>community engagement</strong>. The highest-performing week (Feb 10-16: 280 avg imp/tweet) paired 17 original tweets with ~100 replies to other accounts. Bringing back even 30-50 targeted replies/week alongside the current content quality should push reach back toward those levels. Additionally, kill bare-link CTA tweets and replace with substantive copy that embeds the link.
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    Prodigy.fi Marketing &middot; Weekly Twitter Analytics &middot; Generated Mar 9, 2026
+  </div>
+
+</div>
+</body>
+</html>

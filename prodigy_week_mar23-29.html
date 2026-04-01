@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy Twitter Analytics — Week of Mar 23-29, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .callout {
+    background: rgba(248,81,73,0.08);
+    border: 1px solid rgba(248,81,73,0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+  .callout strong { color: var(--red); }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi Weekly Performance Report</div>
+    <div class="date-range">Mar 23 &ndash; 29, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">19</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;21% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,537</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;49% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">81</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;36% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">50</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;6% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">9.3%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+37% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">8</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+33% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Key Callout -->
+  <div class="callout">
+    <strong>Impressions down 49%, but engagement quality is up.</strong> Avg engagement rate jumped from 6.8% to 9.3%, and URL clicks rose from 6 to 8. Last week's total was inflated by one outlier (the "where does yield come from" explainer at 1,233 impressions &mdash; 41% of last week's total). Removing that, this week's per-tweet reach is comparable. The real issue: no breakout tweet this week, and zero new followers for a second straight week. Of 19 tweets, 5 were reply CTAs and 1 was an outbound reply &mdash; leaving 13 standalone content tweets.
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Avg Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mar 23-29 (this week)</td>
+            <td class="num">19</td>
+            <td class="num">1,537</td>
+            <td class="num">81</td>
+            <td class="num">50</td>
+            <td class="num">2.6</td>
+            <td class="num">17</td>
+            <td class="num">0</td>
+            <td class="num">8</td>
+            <td class="num">9.3%</td>
+          </tr>
+          <tr>
+            <td>Mar 16-22 (last week)</td>
+            <td class="num">24</td>
+            <td class="num">3,020</td>
+            <td class="num">126</td>
+            <td class="num">53</td>
+            <td class="num">2.2</td>
+            <td class="num">20</td>
+            <td class="num">5</td>
+            <td class="num">6</td>
+            <td class="num">6.8%</td>
+          </tr>
+          <tr>
+            <td>Mar 9-15 (2 wks ago)</td>
+            <td class="num">16</td>
+            <td class="num">3,268</td>
+            <td class="num">204</td>
+            <td class="num">67</td>
+            <td class="num">4.2</td>
+            <td class="num">25</td>
+            <td class="num">0</td>
+            <td class="num">7</td>
+            <td class="num">9.4%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Content Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 24</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>crypto traders: analyzing charts for 8 hours. prodigy.fi users: sleeping while earning ~100% APY. who's winning?</div>
+      <div class="tweet-meta">
+        <span class="imp">206 impressions</span>
+        <span>8 likes</span>
+        <span>3 reposts</span>
+        <span>1 click</span>
+        <span>ER: 9.71%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 27</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>hot take: most traders are basically paying other people to win. every few hours, the crowded side of the market sends payments to the other side. it's called funding. and it never stops.</div>
+      <div class="tweet-meta">
+        <span class="imp">204 impressions</span>
+        <span>3 likes</span>
+        <span>1 repost</span>
+        <span>0 clicks</span>
+        <span>ER: 6.37%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 29</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>hot take: everyone panicking about BTC dropping is accidentally creating your best yield opportunity. look at this chart. funding went negative. shorts are now paying longs every few hours just to stay in their trade.</div>
+      <div class="tweet-meta">
+        <span class="imp">129 impressions</span>
+        <span>3 likes</span>
+        <span>1 repost</span>
+        <span>0 clicks</span>
+        <span>ER: 4.65%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 23</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>if you trade 0DTE, this might feel familiar. you enter. you exit. capital works for a while. then it doesn't. 30 minutes. maybe an hour. the rest of the time? it just sits there.</div>
+      <div class="tweet-meta">
+        <span class="imp">109 impressions</span>
+        <span>3 likes</span>
+        <span>1 repost</span>
+        <span>0 clicks</span>
+        <span>ER: 9.17%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 26</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>every day your capital sits idle, you're losing money. not to risk. to opportunity. $20k in a savings account for 30 days = $4 earned. $20k in a ProdigyFi vault for 30 days = $412 earned.</div>
+      <div class="tweet-meta">
+        <span class="imp">94 impressions</span>
+        <span>3 likes</span>
+        <span>1 repost</span>
+        <span>0 clicks</span>
+        <span>ER: 6.38%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reply CTA Analysis -->
+  <section>
+    <h2>Reply CTA Performance</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">5 of the 19 tweets were reply CTAs posted under parent content tweets, plus 1 outbound reply to @tradertheory. Here&rsquo;s how the CTAs performed:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Parent Tweet</th>
+            <th class="num">Parent Imp.</th>
+            <th class="num">Parent Clicks</th>
+            <th>Reply CTA</th>
+            <th class="num">Reply Imp.</th>
+            <th class="num">Reply Clicks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>if you trade 0DTE, this might feel familiar</td>
+            <td class="num">109</td>
+            <td class="num">0</td>
+            <td>&ldquo;let your capital work 24/7&rdquo;</td>
+            <td class="num">56</td>
+            <td class="num">0</td>
+          </tr>
+          <tr>
+            <td>market's stuck between levels</td>
+            <td class="num">77</td>
+            <td class="num">0</td>
+            <td>&ldquo;0DTEs available here:&rdquo;</td>
+            <td class="num">49</td>
+            <td class="num">3</td>
+          </tr>
+          <tr>
+            <td>not all yield is the same</td>
+            <td class="num">70</td>
+            <td class="num">0</td>
+            <td>&ldquo;simple, guaranteed yield here:&rdquo;</td>
+            <td class="num">39</td>
+            <td class="num">1</td>
+          </tr>
+          <tr>
+            <td>two ways to approach yield</td>
+            <td class="num">76</td>
+            <td class="num">0</td>
+            <td>&ldquo;choose yours here:&rdquo;</td>
+            <td class="num">36</td>
+            <td class="num">0</td>
+          </tr>
+          <tr>
+            <td>deposit $20k USDC earn ~$352</td>
+            <td class="num">71</td>
+            <td class="num">1</td>
+            <td>&ldquo;get up to 200% APY here:&rdquo;</td>
+            <td class="num">30</td>
+            <td class="num">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">CTAs generated 4 of the week&rsquo;s 8 URL clicks. The &ldquo;0DTEs available here&rdquo; CTA was the best performer (3 clicks from 49 impressions = 6.1% CTR). However, the parent tweets themselves are still driving almost no clicks &mdash; only 1 click across 403 combined parent impressions. The outbound @tradertheory reply (16 imp, 0 clicks) continues the pattern of low-ROI outbound pitches.</p>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Engagement rate jumped to 9.3%, up 37% from last week&rsquo;s 6.8%.</strong> The audience is interacting more per impression this week. This is the second-highest weekly ER in the last 3 weeks (9.4% two weeks ago).</li>
+      <li><strong>URL clicks hit a 3-week high (8 clicks).</strong> Up from 6 last week and 7 two weeks ago. The CTA strategy is slowly improving &mdash; the &ldquo;0DTEs available here&rdquo; CTA alone drove 3 clicks, showing that product-specific CTAs outperform generic ones.</li>
+      <li><strong>The meme/humor format remains the top performer.</strong> &ldquo;Crypto traders: analyzing charts for 8 hours&rdquo; (206 imp, 8 likes, 9.71% ER) was the #1 tweet again. Relatable humor with an embedded product mention consistently outperforms straight product pitches.</li>
+      <li><strong>&ldquo;Hot take&rdquo; hooks are generating consistent reach.</strong> Both hot-take tweets (204 imp, 129 imp) landed in the top 3. The educational angle &mdash; explaining funding rates, showing how fear creates opportunity &mdash; resonates better than &ldquo;earn X% APY&rdquo; product posts.</li>
+      <li><strong>The &ldquo;two ways to approach yield&rdquo; tweet (76 imp) had a 21% ER</strong> &mdash; the highest ER of any content tweet this week. Short, clear comparisons (short-term vs longer-tenor) with an image attached drove 5 likes and 3 reposts from a small audience.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>No breakout tweet this week.</strong> The ceiling was 206 impressions vs last week&rsquo;s 1,233. Two weeks ago peaked at 1,008. The account hasn&rsquo;t produced a 500+ impression tweet this week. The educational explainer format (&ldquo;where does yield come from&rdquo;, &ldquo;defi myth: you need leverage&rdquo;) that drives breakouts was absent.</li>
+      <li><strong>Zero new followers for a second consecutive week.</strong> 19 tweets, 1,537 impressions, and not a single follow. The content is engaging the existing audience but failing to convert new eyeballs. The account grew by 0 followers across 43 tweets in 2 weeks.</li>
+      <li><strong>Zero bookmarks.</strong> Down from 5 last week. Bookmarks signal &ldquo;save-worthy&rdquo; content (guides, explainers, threads). This week was heavy on short takes and light on deep educational content that people reference later.</li>
+      <li><strong>Avg impressions continue a 3-week decline: 204 &rarr; 126 &rarr; 81.</strong> Reach per tweet has dropped 60% in two weeks. This suggests either algorithm headwinds, posting time issues, or content fatigue from the repetitive &ldquo;earn yield&rdquo; angle.</li>
+      <li><strong>Parent content tweets still aren&rsquo;t driving clicks themselves.</strong> Only 1 URL click came from a parent tweet (out of ~1,300 parent impressions). The CTA-reply strategy is doing the click-driving work, but 0.08% CTR on parent tweets means the link isn&rsquo;t compelling enough in the main post.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Bring back the deep explainer format.</strong> The &ldquo;where does yield come from&rdquo; post (1,233 imp) and &ldquo;defi myth: leverage&rdquo; thread (1,008 imp) were breakout tweets. Do 1-2 of these per week: &ldquo;how 0DTE vaults actually settle&rdquo;, &ldquo;what happens when your vault expires ITM&rdquo;, &ldquo;how funding rate arbitrage works.&rdquo; These earn bookmarks and reach new audiences.</li>
+      <li><strong>Focus on follower conversion.</strong> Two weeks of zero follows means the content isn&rsquo;t giving people a reason to follow. Add a &ldquo;follow for daily DeFi yield alpha&rdquo; CTA to the best-performing tweet of each day. Consider a pinned thread that explains what @ProdigyFi tweets about and why to follow.</li>
+      <li><strong>Double down on the meme + product hybrid.</strong> The &ldquo;crypto traders: analyzing charts for 8 hours&rdquo; format (humor + embedded product mention) has been the top tweet 2 weeks running. Do 2-3 of these per week. The key: make the joke stand on its own, then weave in the product naturally.</li>
+      <li><strong>Embed links in parent tweets, not just reply CTAs.</strong> Parent content tweets averaged 0.08% CTR this week. Either include the link mid-text in the parent (so it&rsquo;s visible at peak attention) or add a &ldquo;start earning&rdquo; link at the end of longer educational posts.</li>
+      <li><strong>Reduce CTA tweet volume.</strong> 5 reply CTAs for 13 content tweets (38% ratio) is high. Cut to 2-3 per week, attached only to the highest-performing content tweets. The generic CTAs (&ldquo;choose yours here&rdquo;, &ldquo;get up to 200% APY&rdquo;) with 0 clicks are diluting the feed.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Type</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Mar 24</td>
+            <td>crypto traders: analyzing charts for 8 hours&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">206</td>
+            <td class="num">8</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">9.71</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Mar 27</td>
+            <td>hot take: most traders are basically paying other people to win&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">204</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.37</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Mar 29</td>
+            <td>hot take: everyone panicking about BTC dropping&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">129</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">4.65</td>
+          </tr>
+          <tr>
+            <td>Mar 23</td>
+            <td>if you trade 0DTE, this might feel familiar&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">109</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">9.17</td>
+          </tr>
+          <tr>
+            <td>Mar 26</td>
+            <td>every day your capital sits idle, you're losing money&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">94</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.38</td>
+          </tr>
+          <tr>
+            <td>Mar 26</td>
+            <td>market's been choppy. no clean breakout&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">85</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.24</td>
+          </tr>
+          <tr>
+            <td>Mar 24</td>
+            <td>market's stuck between levels. no breakout&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">77</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.79</td>
+          </tr>
+          <tr>
+            <td>Mar 25</td>
+            <td>two ways to approach yield: short-term or longer-tenor&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">76</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">21.05</td>
+          </tr>
+          <tr>
+            <td>Mar 28</td>
+            <td>everyone says &ldquo;manage risk&rdquo; but most are just managing losses&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">75</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">14.67</td>
+          </tr>
+          <tr>
+            <td>Mar 23</td>
+            <td>deposit $20k USDC earn ~$352 in ~11 days (49% APY)&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">71</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">12.68</td>
+          </tr>
+          <tr>
+            <td>Mar 23</td>
+            <td>not all yield is the same. some require constant management&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">70</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">11.43</td>
+          </tr>
+          <tr>
+            <td>Mar 27</td>
+            <td>short term trader at 3:59pm: &ldquo;one last trade&rdquo;&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">61</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">13.11</td>
+          </tr>
+          <tr>
+            <td>Mar 26</td>
+            <td>most yield strategies: &lsquo;maybe you'll earn this&rsquo;&hellip;</td>
+            <td class="num">Content</td>
+            <td class="num">54</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">9.26</td>
+          </tr>
+          <tr style="opacity: 0.65;">
+            <td>Mar 23</td>
+            <td>let your capital work 24/7. [link]</td>
+            <td class="num">CTA</td>
+            <td class="num">56</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1.79</td>
+          </tr>
+          <tr style="opacity: 0.65;">
+            <td>Mar 24</td>
+            <td>0DTEs available here: [link]</td>
+            <td class="num">CTA</td>
+            <td class="num">49</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">18.37</td>
+          </tr>
+          <tr style="opacity: 0.65;">
+            <td>Mar 23</td>
+            <td>simple, guaranteed yield here: [link]</td>
+            <td class="num">CTA</td>
+            <td class="num">39</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">12.82</td>
+          </tr>
+          <tr style="opacity: 0.65;">
+            <td>Mar 25</td>
+            <td>choose yours here: [link]</td>
+            <td class="num">CTA</td>
+            <td class="num">36</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2.78</td>
+          </tr>
+          <tr style="opacity: 0.65;">
+            <td>Mar 23</td>
+            <td>get up to 200% APY here: [link]</td>
+            <td class="num">CTA</td>
+            <td class="num">30</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0.00</td>
+          </tr>
+          <tr style="opacity: 0.65;">
+            <td>Mar 25</td>
+            <td>@tradertheory doing nothing is the real edge&hellip;</td>
+            <td class="num">Reply</td>
+            <td class="num">16</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.25</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Mar 30, 2026 &middot; Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>

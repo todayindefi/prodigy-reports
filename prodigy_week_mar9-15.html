@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy Twitter Analytics — Week of Mar 9-15, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+
+  /* Sections */
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+
+  /* WoW comparison table */
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+
+  /* Lists */
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+
+  /* Top tweets */
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi Weekly Performance Report</div>
+    <div class="date-range">Mar 9 &ndash; 15, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">16</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+23% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2,765</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+5.5% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">173</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">-14% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">66</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+40% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">9.9%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+50% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">7</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">-12.5% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Avg Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mar 9-15 (this week)</td>
+            <td class="num">16</td>
+            <td class="num">2,765</td>
+            <td class="num">173</td>
+            <td class="num">66</td>
+            <td class="num">4.1</td>
+            <td class="num">24</td>
+            <td class="num">0</td>
+            <td class="num">7</td>
+            <td class="num">9.9%</td>
+          </tr>
+          <tr>
+            <td>Mar 2-8 (last week)</td>
+            <td class="num">13</td>
+            <td class="num">2,621</td>
+            <td class="num">202</td>
+            <td class="num">47</td>
+            <td class="num">3.6</td>
+            <td class="num">17</td>
+            <td class="num">1</td>
+            <td class="num">8</td>
+            <td class="num">6.6%</td>
+          </tr>
+          <tr>
+            <td>Feb 23 &ndash; Mar 1</td>
+            <td class="num">15</td>
+            <td class="num">1,372</td>
+            <td class="num">91</td>
+            <td class="num">31</td>
+            <td class="num">2.1</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">6</td>
+            <td class="num">10.0%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 10</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>defi myth: You need leverage to earn high yields. reality: leverage is just borrowing volatility. when the market moves against you &rarr; liquidation. structured yield works differently. you're not borrowing risk. you're getting paid to take defined risk. Here's how it works &#x1f9f5;</div>
+      <div class="tweet-meta">
+        <span class="imp">918 impressions</span>
+        <span>5 likes</span>
+        <span>2 reposts</span>
+        <span>ER: 2.83%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 12</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>set it. forget it. compound it. longer-tenor vaults earn predictable returns over days. no daily rebalancing. just steady predictable yield.</div>
+      <div class="tweet-meta">
+        <span class="imp">237 impressions</span>
+        <span>4 likes</span>
+        <span>2 reposts</span>
+        <span>ER: 3.8%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 9</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>US stocks dumping hard, oil exploding past $110 amid escalating geopolitical tensions. macro chaos everywhere. this is exactly when structured yield wins, no guessing direction, just getting paid on volatility.</div>
+      <div class="tweet-meta">
+        <span class="imp">230 impressions</span>
+        <span>4 likes</span>
+        <span>2 reposts</span>
+        <span>ER: 5.22%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 14</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>the leverage trap: you deposit $10k. you borrow $40k (4x leverage). you're now controlling $50k of ETH. market moves 2% against you &rarr; $1k loss (10% of your capital). market moves 5% against you &rarr; liquidation. you're not trading. you're gambling with borrowed money.</div>
+      <div class="tweet-meta">
+        <span class="imp">219 impressions</span>
+        <span>5 likes</span>
+        <span>2 reposts</span>
+        <span>ER: 6.85%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 13</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>early results look promising &#x1f4ca; still collecting data &#x1f468;&#x200d;&#x1f3eb;</div>
+      <div class="tweet-meta">
+        <span class="imp">127 impressions</span>
+        <span>5 likes</span>
+        <span>2 reposts</span>
+        <span>ER: 14.17%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Engagement rate jumped to 9.9%</strong> (up from 6.6% last week) &mdash; people who see the tweets are interacting more</li>
+      <li><strong>Likes nearly doubled</strong> week-over-week (66 vs 47), and reposts jumped from 17 to 24 &mdash; content is resonating better</li>
+      <li><strong>The "defi myth" thread</strong> (918 impressions) was the top performer &mdash; educational/myth-busting content gets reach. Newsjacking the macro chaos ("US stocks dumping hard, oil exploding") also worked well at 230 impressions</li>
+      <li><strong>Concrete examples with numbers land</strong> &mdash; "the leverage trap" post (219 imp, 6.85% ER) and "hot take: trying to time the market" (111 imp, 6.31% ER) both performed well with strong opinionated hooks</li>
+      <li><strong>Volume was up</strong> (16 tweets vs 13 last week) without diluting overall quality</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Avg impressions dropped from 202 to 173</strong> despite more total impressions &mdash; higher volume means some tweets are pulling the average down. Quality &gt; quantity</li>
+      <li><strong>URL clicks stayed flat at 7</strong> (actually down from 8) &mdash; content is engaging but not driving traffic to the product. CTAs are getting lost or feel too tacked-on</li>
+      <li><strong>Zero bookmarks this week</strong> (vs 1 last week) &mdash; bookmarks signal high-value "save for later" content. Educational posts this week were good but perhaps too bite-sized to bookmark</li>
+      <li><strong>Thread tweets dropped off hard</strong> &mdash; the "defi myth" thread opener got 918 impressions but tweet 2 got 96 and tweet 3 got 74. That's a ~90% dropoff</li>
+      <li><strong>Reply tweets and generic promos underperform</strong> &mdash; the @base reply (53 imp) and the 0DTE vault tweet (77 imp) are low-reach filler</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Fix the CTA problem.</strong> Engagement is strong but clicks are flat. Embed the link naturally into the narrative rather than appending it at the end. The "stablecoins costing you money" post was the only one with a URL click &mdash; it wove the CTA into the story.</li>
+      <li><strong>Lean into formats that work.</strong> Opinionated hot takes, concrete examples with numbers ("deposit $10k, borrow $40k"), and newsjacking macro events all outperformed generic product tweets.</li>
+      <li><strong>Rethink threads.</strong> 90% dropoff from tweet 1 to 2 means the audience isn't clicking through. Consider putting the key insight in a single tweet with an image, or make tweet 1 more of a cliffhanger.</li>
+      <li><strong>Trim low-value tweets.</strong> Reply farming (@base) and generic vault promos drag the average down. Posting 12-13 higher-quality tweets may outperform 16 mixed ones.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Mar 10</td>
+            <td>defi myth: You need leverage to earn high yields&hellip;</td>
+            <td class="num">918</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">2.83</td>
+          </tr>
+          <tr>
+            <td>Mar 12</td>
+            <td>set it. forget it. compound it&hellip;</td>
+            <td class="num">237</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">3.80</td>
+          </tr>
+          <tr>
+            <td>Mar 9</td>
+            <td>US stocks dumping hard, oil exploding&hellip;</td>
+            <td class="num">230</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">5.22</td>
+          </tr>
+          <tr>
+            <td>Mar 14</td>
+            <td>the leverage trap: you deposit $10k&hellip;</td>
+            <td class="num">219</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">6.85</td>
+          </tr>
+          <tr>
+            <td>Mar 13</td>
+            <td>early results look promising &#x1f4ca;&hellip;</td>
+            <td class="num">127</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">14.17</td>
+          </tr>
+          <tr>
+            <td>Mar 11</td>
+            <td>most people: "the market is too unpredictable"&hellip;</td>
+            <td class="num">126</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">5</td>
+            <td class="num">11.90</td>
+          </tr>
+          <tr>
+            <td>Mar 9</td>
+            <td>earn up to ~200% APR on ETH&hellip;</td>
+            <td class="num">125</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">7.20</td>
+          </tr>
+          <tr>
+            <td>Mar 15</td>
+            <td>hot take: trying to perfectly time the market&hellip;</td>
+            <td class="num">111</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">6.31</td>
+          </tr>
+          <tr>
+            <td>Mar 13</td>
+            <td>your stablecoins might be costing you money&hellip;</td>
+            <td class="num">110</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">1</td>
+            <td class="num">9.09</td>
+          </tr>
+          <tr>
+            <td>Mar 10</td>
+            <td>2/ you set a sell high for ETH at $3500&hellip;</td>
+            <td class="num">96</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.29</td>
+          </tr>
+          <tr>
+            <td>Mar 9</td>
+            <td>predictable ETH yield. no liquidations&hellip;</td>
+            <td class="num">92</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">10.87</td>
+          </tr>
+          <tr>
+            <td>Mar 10</td>
+            <td>one group is panicking about direction&hellip;</td>
+            <td class="num">86</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">20.93</td>
+          </tr>
+          <tr>
+            <td>Mar 12</td>
+            <td>macro uncertainty = retail panic&hellip;</td>
+            <td class="num">84</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">14.29</td>
+          </tr>
+          <tr>
+            <td>Mar 12</td>
+            <td>daily opportunities. daily premium. 0DTE vaults&hellip;</td>
+            <td class="num">77</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">10.39</td>
+          </tr>
+          <tr>
+            <td>Mar 10</td>
+            <td>3/ that's how prodigy.fi works&hellip;</td>
+            <td class="num">74</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.76</td>
+          </tr>
+          <tr>
+            <td>Mar 11</td>
+            <td>@base the epitome of fast simple predictable&hellip;</td>
+            <td class="num">53</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">20.75</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Mar 17, 2026 &middot; Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy Twitter Analytics — Week of Mar 16-22, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .callout {
+    background: rgba(248,81,73,0.08);
+    border: 1px solid rgba(248,81,73,0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+  .callout strong { color: var(--red); }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi Weekly Performance Report</div>
+    <div class="date-range">Mar 16 &ndash; 22, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">24</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+50% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2,832</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">-12% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">118</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">-41% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">53</div>
+      <div class="label">Likes</div>
+      <div class="delta down">-21% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">7.4%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">-21% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">6</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">-14% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Key Callout -->
+  <div class="callout">
+    <strong>Volume up 50% (24 tweets vs 16), but headline metrics are down.</strong> However, context matters: 7 of those 24 are reply CTAs attached to parent content tweets — not standalone filler. Excluding reply CTAs, the account posted 17 content tweets (up from 16). The real issue is that the content tweets themselves averaged lower impressions this week.
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Avg Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mar 16-22 (this week)</td>
+            <td class="num">24</td>
+            <td class="num">2,832</td>
+            <td class="num">118</td>
+            <td class="num">53</td>
+            <td class="num">2.2</td>
+            <td class="num">20</td>
+            <td class="num">5</td>
+            <td class="num">6</td>
+            <td class="num">7.4%</td>
+          </tr>
+          <tr>
+            <td>Mar 9-15 (last week)</td>
+            <td class="num">16</td>
+            <td class="num">3,209</td>
+            <td class="num">201</td>
+            <td class="num">67</td>
+            <td class="num">4.2</td>
+            <td class="num">25</td>
+            <td class="num">0</td>
+            <td class="num">7</td>
+            <td class="num">9.4%</td>
+          </tr>
+          <tr>
+            <td>Mar 2-8 (2 wks ago)</td>
+            <td class="num">13</td>
+            <td class="num">2,786</td>
+            <td class="num">214</td>
+            <td class="num">47</td>
+            <td class="num">3.6</td>
+            <td class="num">17</td>
+            <td class="num">1</td>
+            <td class="num">8</td>
+            <td class="num">6.4%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 17</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>where does ProdigyFi yield actually come from? simple: risk exchange. a trader wants to express a market view or hedge downside. they pay premium to a user who is willing to take the other side. users deposit liquidity and earn that premium as yield.</div>
+      <div class="tweet-meta">
+        <span class="imp">1,218 impressions</span>
+        <span>7 likes</span>
+        <span>2 reposts</span>
+        <span>4 bookmarks</span>
+        <span>ER: 2.22%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 16</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>how buy low vaults actually work (and why you're probably doing it wrong). you want to buy ETH at $2,275. but you don't want to sit and watch charts all day. enter: buy low vaults.</div>
+      <div class="tweet-meta">
+        <span class="imp">196 impressions</span>
+        <span>8 likes</span>
+        <span>2 reposts</span>
+        <span>1 bookmark</span>
+        <span>ER: 13.78%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 18</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>you hold ETH, and you want to lock in a higher exit price. set a target sell price ($2,600) &rarr; deposit into a sell high vault &rarr; earn yield while you wait. at expiry: if ETH &ge; $2,600 &rarr; you sell at your target + earn yield. if ETH &lt; $2,600 &rarr; you keep ETH + earn yield.</div>
+      <div class="tweet-meta">
+        <span class="imp">147 impressions</span>
+        <span>4 likes</span>
+        <span>3 reposts</span>
+        <span>1 reply</span>
+        <span>ER: 10.2%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 19</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>market moves every day. so should your strategy. 0DTE vaults let you set a price and earn yield in 24 hours.</div>
+      <div class="tweet-meta">
+        <span class="imp">123 impressions</span>
+        <span>4 likes</span>
+        <span>1 repost</span>
+        <span>2 replies</span>
+        <span>ER: 10.57%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 19</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>pov: you're holding 10 ETH. you think it might dump. sell high vault: set your exit price at $2,375. earn up to 200% APR while you hold. if ETH hits $2,375 &rarr; you sell at your price + yield. if it doesn't &rarr; you keep your 10 ETH + yield.</div>
+      <div class="tweet-meta">
+        <span class="imp">121 impressions</span>
+        <span>5 likes</span>
+        <span>3 reposts</span>
+        <span>ER: 10.74%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>The "where does yield come from" explainer hit 1,218 impressions</strong> &mdash; the best single tweet across all 3 weeks. This is the highest-reach tweet the Prodigy account has had in the data. Educational content that answers a fundamental question the audience cares about consistently wins.</li>
+      <li><strong>Bookmarks jumped from 0 to 5.</strong> The yield explainer (4 bookmarks) and buy-low walkthrough (1 bookmark) are being saved for later &mdash; a signal people find real value in step-by-step educational content.</li>
+      <li><strong>The "how buy low vaults work" walkthrough</strong> (196 imp, 13.78% ER) had the best engagement rate among high-reach tweets. Concrete, numbered step-by-step formats perform well.</li>
+      <li><strong>Scenario-based tweets resonated.</strong> Both the sell-high vault explainer (147 imp) and the "pov: you're holding 10 ETH" tweet (121 imp, 3 reposts each) used concrete examples with real numbers that make the product tangible.</li>
+      <li><strong>The meme tweet</strong> ("crypto traders know this feeling", 98 imp, 6 likes) outperformed most product tweets &mdash; showing that relatable humor still has a place in the content mix.</li>
+    </ul>
+  </section>
+
+  <!-- Reply CTA Analysis -->
+  <section>
+    <h2>Reply CTA Performance</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">7 of the 24 tweets were reply CTAs posted under parent content tweets. Here's how each pair performed:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Parent Tweet</th>
+            <th class="num">Parent Imp.</th>
+            <th class="num">Parent Clicks</th>
+            <th>Reply CTA</th>
+            <th class="num">Reply Imp.</th>
+            <th class="num">Reply Clicks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>sell high vault explainer</td>
+            <td class="num">147</td>
+            <td class="num">0</td>
+            <td>"deposit here:"</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+          </tr>
+          <tr>
+            <td>not all yield is created equal</td>
+            <td class="num">81</td>
+            <td class="num">0</td>
+            <td>"get your real yield here:"</td>
+            <td class="num">16</td>
+            <td class="num">0</td>
+          </tr>
+          <tr>
+            <td>fed held rates</td>
+            <td class="num">89</td>
+            <td class="num">2</td>
+            <td>"earn ~200% here:"</td>
+            <td class="num">49</td>
+            <td class="num">1</td>
+          </tr>
+          <tr>
+            <td>saturday mood</td>
+            <td class="num">92</td>
+            <td class="num">0</td>
+            <td>"still here 24/7 for you"</td>
+            <td class="num">48</td>
+            <td class="num">0</td>
+          </tr>
+          <tr>
+            <td>your bank: ~0.5%</td>
+            <td class="num">84</td>
+            <td class="num">0</td>
+            <td>"up to 200% APY here:"</td>
+            <td class="num">45</td>
+            <td class="num">2</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Reply CTAs generated 3 of the week's 6 total URL clicks. They're doing their job as conversion tails, but reach varies wildly (2 to 49 impressions). The "deposit here:" reply on the sell-high explainer was essentially invisible at 2 impressions.</p>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Content tweet avg impressions still dropped.</strong> Even excluding reply CTAs, the 17 content tweets averaged ~159 impressions vs 201 last week. The top tweet (1,218) carried the total &mdash; median content tweet performance was closer to 89 impressions.</li>
+      <li><strong>Reply CTA reach is inconsistent.</strong> Some reply CTAs get 45-49 impressions (decent), others get 2-16 (invisible). The "deposit here:" reply on the sell-high explainer got 2 impressions &mdash; essentially no one saw it. The ones that worked better ("earn ~200% here:", "up to 200% APY here:") included a specific yield number in the text.</li>
+      <li><strong>Reply CTAs are the primary click driver (3 of 6 clicks) but still low volume.</strong> The parent content tweets themselves are driving almost no clicks (3 clicks from ~2,600 combined impressions). The CTA strategy is working in concept but the conversion funnel is thin.</li>
+      <li><strong>Outbound reply tweets flopped.</strong> The @tradertheory reply (35 imp), @fintechfrank reply (23 imp), and @iamdisplacement reply (54 imp, 0 likes) got minimal traction. Long-form product pitches in other people's replies aren't reaching beyond the original poster's audience.</li>
+      <li><strong>The "when the market moves like this" tweet (10 imp) was a standalone with a link, not a reply CTA.</strong> It read like a CTA without any setup &mdash; a parent tweet that had no parent content. It performed the worst of all non-reply tweets.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Improve reply CTA copy.</strong> The reply CTAs that include a specific number ("earn ~200%", "up to 200% APY") get 45-49 impressions and drive clicks. The generic ones ("deposit here:", "try yours here:") get 2-16 impressions and zero clicks. Always include a specific yield figure or dollar amount in the reply CTA.</li>
+      <li><strong>Add the link to the parent tweet too.</strong> The #1 tweet (1,218 imp) had no link at all — it relied entirely on a reply CTA that far fewer people saw. Embedding a link in the parent tweet itself (even mid-text) would capture the audience at peak attention rather than hoping they scroll to the reply.</li>
+      <li><strong>Make the explainer format a weekly staple.</strong> The #1 tweet (1,218 imp) and #2 tweet (196 imp, 13.78% ER) were both "here's how X works" posts. Do 2-3 of these per week &mdash; "how sell-high works", "what happens at expiry", "where does premium come from", etc. These earn bookmarks and reach.</li>
+      <li><strong>Cut the outbound reply pitches.</strong> The @tradertheory (35 imp), @fintechfrank (23 imp), and @iamdisplacement (54 imp, 0 likes) replies aren't converting. These long-form product pitches in other people's threads aren't reaching their audience. Try shorter, more natural engagement instead of selling in replies.</li>
+      <li><strong>Pair scenario tweets with real vault data.</strong> The "pov: holding 10 ETH" format works (121 imp, 3 reposts). Make it even more compelling by adding actual current vault APRs and real dollar amounts. "This vault returned $X this week" is more clickable than "earn up to 200% APR."</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Mar 17</td>
+            <td>where does ProdigyFi yield actually come from?&hellip;</td>
+            <td class="num">1,218</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">2.22</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Mar 16</td>
+            <td>how buy low vaults actually work&hellip;</td>
+            <td class="num">196</td>
+            <td class="num">8</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">13.78</td>
+          </tr>
+          <tr>
+            <td>Mar 18</td>
+            <td>you hold ETH, and you want to lock in a higher exit&hellip;</td>
+            <td class="num">147</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">10.20</td>
+          </tr>
+          <tr>
+            <td>Mar 19</td>
+            <td>market moves every day. so should your strategy&hellip;</td>
+            <td class="num">123</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">10.57</td>
+          </tr>
+          <tr>
+            <td>Mar 19</td>
+            <td>pov: you're holding 10 ETH&hellip;</td>
+            <td class="num">121</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">10.74</td>
+          </tr>
+          <tr>
+            <td>Mar 17</td>
+            <td>crypto traders know this feeling&hellip;</td>
+            <td class="num">98</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">12.24</td>
+          </tr>
+          <tr>
+            <td>Mar 21</td>
+            <td>saturday mood: markets are wild, but your money's working&hellip;</td>
+            <td class="num">92</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.70</td>
+          </tr>
+          <tr>
+            <td>Mar 19</td>
+            <td>set your price. let time do the work&hellip;</td>
+            <td class="num">90</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.89</td>
+          </tr>
+          <tr>
+            <td>Mar 20</td>
+            <td>fed held rates. market's in fear. traders are getting liquidated&hellip;</td>
+            <td class="num">89</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">21.35</td>
+          </tr>
+          <tr>
+            <td>Mar 16</td>
+            <td>every day your USDC sits idle, it's earning 0%&hellip;</td>
+            <td class="num">84</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">10.71</td>
+          </tr>
+          <tr>
+            <td>Mar 22</td>
+            <td>your bank: ~0.5%. most platforms: 3-8%. prodigy.fi: 59% APY&hellip;</td>
+            <td class="num">84</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">19.05</td>
+          </tr>
+          <tr>
+            <td>Mar 16</td>
+            <td>some traders spend the morning watching charts&hellip;</td>
+            <td class="num">83</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.23</td>
+          </tr>
+          <tr>
+            <td>Mar 20</td>
+            <td>not all yield is created equal&hellip;</td>
+            <td class="num">81</td>
+            <td class="num">1</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.64</td>
+          </tr>
+          <tr>
+            <td>Mar 19</td>
+            <td>@iamdisplacement predictable yield</td>
+            <td class="num">54</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1.85</td>
+          </tr>
+          <tr>
+            <td>Mar 20</td>
+            <td>earn ~200% here: [link]</td>
+            <td class="num">49</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">2.04</td>
+          </tr>
+          <tr>
+            <td>Mar 21</td>
+            <td>don't forget we are still here 24/7 for you</td>
+            <td class="num">48</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">4.17</td>
+          </tr>
+          <tr>
+            <td>Mar 22</td>
+            <td>up to 200% APY here: [link]</td>
+            <td class="num">45</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">20.00</td>
+          </tr>
+          <tr>
+            <td>Mar 20</td>
+            <td>try yours here: [link]</td>
+            <td class="num">36</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2.78</td>
+          </tr>
+          <tr>
+            <td>Mar 16</td>
+            <td>@tradertheory yelling 'it's early' actually&hellip;</td>
+            <td class="num">35</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2.86</td>
+          </tr>
+          <tr>
+            <td>Mar 16</td>
+            <td>@fintechfrank prediction markets are really just&hellip;</td>
+            <td class="num">23</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0.00</td>
+          </tr>
+          <tr>
+            <td>Mar 20</td>
+            <td>get your real yield here: [link]</td>
+            <td class="num">16</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0.00</td>
+          </tr>
+          <tr>
+            <td>Mar 18</td>
+            <td>when the market moves like this&hellip; choose yours here: [link]</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0.00</td>
+          </tr>
+          <tr>
+            <td>Mar 20</td>
+            <td>try yours here: [link]</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0.00</td>
+          </tr>
+          <tr>
+            <td>Mar 18</td>
+            <td>deposit here: [link]</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Mar 25, 2026 &middot; Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>

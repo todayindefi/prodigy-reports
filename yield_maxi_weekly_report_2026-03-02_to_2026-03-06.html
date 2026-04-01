@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Report — Mar 2-6, 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f14; color: #e0e0e6; line-height: 1.6; padding: 40px 20px; }
+  .container { max-width: 800px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid #2a2a35; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .header .subtitle { font-size: 14px; color: #888; letter-spacing: 1px; text-transform: uppercase; }
+  .header .date-range { font-size: 18px; color: #a78bfa; margin-top: 8px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; }
+  .kpi { background: #1a1a24; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #2a2a35; }
+  .kpi .value { font-size: 32px; font-weight: 700; color: #fff; }
+  .kpi .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .kpi .delta { font-size: 13px; margin-top: 6px; }
+  .kpi .delta.up { color: #4ade80; }
+  .kpi .delta.down { color: #f87171; }
+  .kpi .delta.neutral { color: #888; }
+
+  h2 { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid #a78bfa; display: inline-block; }
+  .section { margin-bottom: 48px; }
+
+  .insight-list { list-style: none; }
+  .insight-list li { padding: 14px 16px; background: #1a1a24; border-radius: 10px; margin-bottom: 10px; border-left: 3px solid #a78bfa; }
+  .insight-list li.green { border-left-color: #4ade80; }
+  .insight-list li.red { border-left-color: #f87171; }
+  .insight-list li strong { color: #fff; }
+  .insight-list li .metric { color: #a78bfa; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th { text-align: left; padding: 10px 12px; color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #2a2a35; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #1f1f2a; }
+  tbody tr:hover { background: #1a1a24; }
+  .highlight-row { background: #1a1a24; }
+  .highlight-row td { color: #fff; font-weight: 500; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .best { color: #4ade80; font-weight: 600; }
+
+  .top-tweets { margin-top: 12px; }
+  .tweet-card { background: #1a1a24; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; border: 1px solid #2a2a35; }
+  .tweet-card .tweet-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .tweet-card .tweet-date { font-size: 12px; color: #888; }
+  .tweet-card .tweet-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge-top { background: #4ade8020; color: #4ade80; }
+  .badge-thread { background: #a78bfa20; color: #a78bfa; }
+  .badge-news { background: #fbbf2420; color: #fbbf24; }
+  .tweet-card .tweet-text { font-size: 15px; color: #d0d0d8; margin-bottom: 14px; }
+  .tweet-card .tweet-stats { display: flex; gap: 20px; font-size: 13px; color: #888; flex-wrap: wrap; }
+  .tweet-card .tweet-stats span strong { color: #fff; }
+  .tweet-reply { margin-left: 24px; border-left: 2px solid #2a2a35; padding-left: 16px; margin-top: -4px; margin-bottom: 12px; }
+  .tweet-reply .tweet-card { border: 1px solid #1f1f2a; background: #15151e; }
+  .tweet-reply .reply-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+  .callout { background: linear-gradient(135deg, #1a1a24, #1f1a2e); border: 1px solid #a78bfa40; border-radius: 12px; padding: 24px; margin-top: 12px; }
+  .callout h3 { color: #a78bfa; font-size: 16px; margin-bottom: 10px; }
+  .callout p { font-size: 14px; color: #c0c0c8; }
+  .callout ul { list-style: none; margin-top: 10px; }
+  .callout ul li { font-size: 14px; color: #c0c0c8; padding: 4px 0; padding-left: 16px; position: relative; }
+  .callout ul li::before { content: "->"; position: absolute; left: 0; color: #a78bfa; }
+
+  .footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #2a2a35; font-size: 12px; color: #555; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="subtitle">Twitter Performance Report</div>
+    <h1>Yield Maxi (@0xYield_Maxi)</h1>
+    <div class="date-range">Week 9 &mdash; March 2 &ndash; 6, 2026</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">2,712</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+121% vs prior week</div>
+    </div>
+    <div class="kpi">
+      <div class="value">387</div>
+      <div class="label">Avg Imp / Tweet</div>
+      <div class="delta up">All-time best</div>
+    </div>
+    <div class="kpi">
+      <div class="value">12</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">Best week on record</div>
+    </div>
+    <div class="kpi">
+      <div class="value">16.0%</div>
+      <div class="label">Engagement Rate</div>
+      <div class="delta neutral">Stable vs prior week</div>
+    </div>
+  </div>
+
+  <!-- What Went Well -->
+  <div class="section">
+    <h2>What Went Well</h2>
+    <ul class="insight-list">
+      <li class="green">
+        <strong>Best impression week in 6 weeks.</strong> <span class="metric">2,712 total impressions</span> from 7 tweets, beating Week 3's strong showing (2,414 from 8 tweets). Average impressions per tweet hit <span class="metric">387</span> &mdash; an all-time high for this account.
+      </li>
+      <li class="green">
+        <strong>The "Wheel" article was a breakout hit.</strong> "Stop Paying to Trade ETH. Get Paid Instead." &mdash; a long-form X article explaining the Wheel strategy on Prodigy with branded graphics (perp losses vs vault yield), vault screenshots, and a step-by-step walkthrough. Hit <span class="metric">2,457 impressions, 97 engagements, 11 URL clicks, 4 bookmarks, 3 reposts, 1 new follow</span>. Educational long-form with strong visuals is clearly the highest-ceiling format.
+      </li>
+      <li class="green">
+        <strong>Narrative-driven tweets outperform.</strong> The "options are underrated" thread (Mar 3) hit <span class="metric">23.5% engagement rate</span> with 7 likes and 1 repost. Hook + insight + product tie-in remains the winning formula.
+      </li>
+      <li class="green">
+        <strong>Newsjacking delivers highest ER.</strong> The Khamenei/market instability tweet (Mar 2) hit <span class="metric">35.6% engagement rate</span> and 6 likes from just 45 impressions. Current events tied to product value prop punches well above its weight.
+      </li>
+      <li class="green">
+        <strong>Clicks and follows returned.</strong> <span class="metric">12 URL clicks</span> and 1 new follow this week vs. zero clicks across weeks 4&ndash;7. The self-reply CTA pattern is converting.
+      </li>
+    </ul>
+  </div>
+
+  <!-- What Could Be Improved -->
+  <div class="section">
+    <h2>What Could Be Improved</h2>
+    <ul class="insight-list">
+      <li class="red">
+        <strong>One tweet carried the entire week.</strong> Remove the Mar 6 outlier and you're at <span class="metric">255 impressions across 6 tweets (avg 42)</span>. That's below even the weakest weeks. The non-viral main tweets underperformed.
+      </li>
+      <li class="red">
+        <strong>Standalone pitchy tweets still fall flat.</strong> "Farming yield > trading the one minute chart" got <span class="metric">25 impressions</span> and the vault pitch on Mar 4 got <span class="metric">30 impressions</span>. These lack a stat, question, or news hook in the opening line.
+      </li>
+      <li class="red">
+        <strong>Posting tapered off late in the week.</strong> Only 1 tweet on Mar 5 and 1 on Mar 6. Your strongest weeks (W3, W5) had consistent daily output of 1&ndash;2+ quality posts.
+      </li>
+      <li class="red">
+        <strong>No images/media on most tweets.</strong> The two biggest hits this period (Mar 6 at 2,457 imp, "interesting charts" at 975 imp) both had media. Text-only posts averaged ~40 impressions.
+      </li>
+    </ul>
+  </div>
+
+  <!-- Week-over-Week Comparison -->
+  <div class="section">
+    <h2>Week-over-Week Comparison</h2>
+    <p style="font-size: 13px; color: #888; margin-bottom: 16px;">Includes main tweets and self-reply CTAs. Replies to other accounts excluded from averages.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Week</th>
+          <th class="num">Tweets</th>
+          <th class="num">Impressions</th>
+          <th class="num">Avg Imp</th>
+          <th class="num">Likes</th>
+          <th class="num">Clicks</th>
+          <th class="num">Follows</th>
+          <th class="num">Avg ER</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td><strong>W9 (Mar 2&ndash;6)</strong></td>
+          <td class="num">7</td>
+          <td class="num best">2,712</td>
+          <td class="num best">387</td>
+          <td class="num best">31</td>
+          <td class="num best">12</td>
+          <td class="num">1</td>
+          <td class="num">16.0%</td>
+        </tr>
+        <tr>
+          <td>W8 (Feb 23&ndash;27)</td>
+          <td class="num">7</td>
+          <td class="num">1,228</td>
+          <td class="num">175</td>
+          <td class="num">28</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">16.1%</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>W7 (Feb 16&ndash;20)</td>
+          <td class="num">2</td>
+          <td class="num">258</td>
+          <td class="num">129</td>
+          <td class="num">9</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num">8.1%</td>
+        </tr>
+        <tr>
+          <td>W6 (Feb 9&ndash;13)</td>
+          <td class="num">6</td>
+          <td class="num">1,768</td>
+          <td class="num">295</td>
+          <td class="num">28</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num">2.8%</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>W5 (Feb 2&ndash;6)</td>
+          <td class="num">12</td>
+          <td class="num">1,250</td>
+          <td class="num">104</td>
+          <td class="num">38</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num">9.3%</td>
+        </tr>
+        <tr>
+          <td>W4 (Jan 26&ndash;30)</td>
+          <td class="num">6</td>
+          <td class="num">481</td>
+          <td class="num">80</td>
+          <td class="num">17</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num">17.3%</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>W3 (Jan 19&ndash;23)</td>
+          <td class="num">8</td>
+          <td class="num">2,414</td>
+          <td class="num">302</td>
+          <td class="num">27</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">15.7%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Top Tweets -->
+  <div class="section">
+    <h2>Top Tweets This Week</h2>
+    <div class="top-tweets">
+
+      <div class="tweet-card">
+        <div class="tweet-meta">
+          <span class="tweet-date">Mar 6 &middot; Standalone</span>
+          <span class="tweet-badge badge-top">Top Reach</span>
+        </div>
+        <div class="tweet-text"><strong>"Stop Paying to Trade ETH. Get Paid Instead."</strong> &mdash; Long-form X article explaining the Wheel strategy on Prodigy. Features branded graphic comparing perp trading losses (-$4,280) vs vault yield (+$312), vault screenshots with live APYs, and a full walkthrough of the Buy Low / Sell High rotation cycle.</div>
+        <div class="tweet-stats">
+          <span><strong>2,457</strong> impressions</span>
+          <span><strong>7</strong> likes</span>
+          <span><strong>97</strong> engagements</span>
+          <span><strong>11</strong> URL clicks</span>
+          <span><strong>4</strong> bookmarks</span>
+          <span><strong>1</strong> new follow</span>
+          <span><strong>3.95%</strong> eng rate</span>
+        </div>
+      </div>
+
+      <div class="tweet-card">
+        <div class="tweet-meta">
+          <span class="tweet-date">Mar 3 &middot; Thread head</span>
+          <span class="tweet-badge badge-thread">Thread + CTA</span>
+        </div>
+        <div class="tweet-text">"Options are forever underrated" Most people don't understand options, those that do can harvest thick premiums. Our 23 day Buy Low vaults offer 11% APY on USD or potentially much much more &mdash; great yields in a tough market.</div>
+        <div class="tweet-stats">
+          <span><strong>81</strong> impressions</span>
+          <span><strong>7</strong> likes</span>
+          <span><strong>19</strong> engagements</span>
+          <span><strong>1</strong> repost</span>
+          <span><strong>23.5%</strong> eng rate</span>
+        </div>
+      </div>
+      <div class="tweet-reply">
+        <div class="reply-label">Self-reply CTA</div>
+        <div class="tweet-card">
+          <div class="tweet-text">check out 11% or more on USD with our 23 day vaults: [link]</div>
+          <div class="tweet-stats">
+            <span><strong>18</strong> impressions</span>
+            <span><strong>2</strong> likes</span>
+            <span><strong>1</strong> URL click</span>
+            <span><strong>16.7%</strong> eng rate</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tweet-card">
+        <div class="tweet-meta">
+          <span class="tweet-date">Mar 2 &middot; Standalone</span>
+          <span class="tweet-badge badge-news">Newsjack</span>
+        </div>
+        <div class="tweet-text">The US has just taken out Khamenei. With markets unstable, you want to get every % out of your ETH. Our Sell High vaults let you earn great yield on ETH. If prices rise, you may also get a nice sell price &mdash; which you can take as profit, or cycle into more ETH on a dip.</div>
+        <div class="tweet-stats">
+          <span><strong>45</strong> impressions</span>
+          <span><strong>6</strong> likes</span>
+          <span><strong>16</strong> engagements</span>
+          <span><strong>35.6%</strong> eng rate</span>
+        </div>
+      </div>
+
+      <div class="tweet-card">
+        <div class="tweet-meta">
+          <span class="tweet-date">Mar 4 &middot; Standalone</span>
+          <span class="tweet-badge badge-thread">Market Context</span>
+        </div>
+        <div class="tweet-text">ETF flows were positive last week, showing risk on appetite improving.</div>
+        <div class="tweet-stats">
+          <span><strong>56</strong> impressions</span>
+          <span><strong>4</strong> likes</span>
+          <span><strong>8</strong> engagements</span>
+          <span><strong>1</strong> reply</span>
+          <span><strong>14.3%</strong> eng rate</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Recommendations -->
+  <div class="section">
+    <div class="callout">
+      <h3>Recommendations</h3>
+      <p>Impressions are trending strongly upward (258 &rarr; 1,228 &rarr; 2,712 over 3 weeks) and URL clicks had their best week ever. The Wheel article proved that long-form educational content with strong visuals is the highest-ceiling format on this account.</p>
+      <ul>
+        <li><strong>Do more X articles.</strong> The Wheel explainer single-handedly made this the best week in 6 weeks. The format rewards educational, visual, long-form content &mdash; exactly what Prodigy's product needs to explain. Consider a series: one article per vault type, or market-condition playbooks.</li>
+        <li><strong>Every main tweet needs a hook in line 1</strong> &mdash; a stat, a question, or a news event. Drop tweets that lead with a product pitch.</li>
+        <li><strong>Add visuals more consistently</strong> &mdash; the Wheel article's branded graphic (perp losses vs vault yield) is a template worth reusing in regular tweets too.</li>
+        <li><strong>Maintain 1&ndash;2 quality posts per day</strong> &mdash; the mid-week gaps (1 tweet/day on Mar 5&ndash;6) leave impressions on the table.</li>
+        <li><strong>Keep the self-reply CTA pattern</strong> &mdash; it's generating real clicks. Consider giving CTA replies slightly more copy to improve their standalone reach.</li>
+        <li><strong>Newsjack more aggressively</strong> &mdash; the Khamenei tweet proves that tying current events to the product value prop is the highest-ER format for short posts.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    Prodigy.fi Marketing &middot; Yield Maxi Weekly Analytics &middot; Generated Mar 9, 2026
+  </div>
+
+</div>
+</body>
+</html>
