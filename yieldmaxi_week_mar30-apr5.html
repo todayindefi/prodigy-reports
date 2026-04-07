@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Analytics — Week of Mar 30 – Apr 5, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Yield Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Mar 30 &ndash; Apr 5, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">5</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">-38% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">763</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">-86% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">153</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">-77% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">24</div>
+      <div class="label">Likes</div>
+      <div class="delta down">-43% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">11.9%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+105% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">5</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">-58% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Avg Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mar 30 – Apr 5 (this week)</td>
+            <td class="num">5</td>
+            <td class="num">763</td>
+            <td class="num">153</td>
+            <td class="num">24</td>
+            <td class="num">4.8</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">5</td>
+            <td class="num">11.9%</td>
+          </tr>
+          <tr>
+            <td>Mar 23-29 (last week)</td>
+            <td class="num">8</td>
+            <td class="num">5,265</td>
+            <td class="num">658</td>
+            <td class="num">42</td>
+            <td class="num">5.3</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">12</td>
+            <td class="num">5.8%</td>
+          </tr>
+          <tr>
+            <td>Mar 16-22 (2 wks ago)</td>
+            <td class="num">8</td>
+            <td class="num">2,922</td>
+            <td class="num">365</td>
+            <td class="num">53</td>
+            <td class="num">6.6</td>
+            <td class="num">10</td>
+            <td class="num">7</td>
+            <td class="num">1</td>
+            <td class="num">7.8%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 3</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Markets hate war. Options premiums love war. Stop getting chopped up trading war uncertainty &mdash; start earning up to 46% APY on prodigy.fi with our 6 day vaults.</div>
+      <div class="tweet-meta">
+        <span class="imp">307 impressions</span>
+        <span>7 likes</span>
+        <span>3 reposts</span>
+        <span>0 replies</span>
+        <span>3 URL clicks</span>
+        <span>ER: 7.49%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 31</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>It's a bear market for yields&hellip; except on Prodigy, where we're still offering 16%+ on our 10 day vaults. Pick a price you think ETH won't hit; collect yield in 10 days. Easy.</div>
+      <div class="tweet-meta">
+        <span class="imp">274 impressions</span>
+        <span>6 likes</span>
+        <span>2 reposts</span>
+        <span>1 reply</span>
+        <span>2 URL clicks</span>
+        <span>ER: 7.66%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 1</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>At Prodigy we're long term bullish on ETH &mdash; it drives DeFi, stablecoins, tokenization, and it's best positioned to deal with upcoming threats like quantum computing. ETH is the future of crypto, and you can stack it on prodigy.fi.</div>
+      <div class="tweet-meta">
+        <span class="imp">90 impressions</span>
+        <span>6 likes</span>
+        <span>0 reposts</span>
+        <span>0 clicks</span>
+        <span>ER: 12.22%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Mar 30</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>Funding rates, which were negative in past weeks, seem like they may be turning around. This can often precede the market turning as well. If you think the market will turn positive, our 11d vaults are offering 33-68% yield on your USDC.</div>
+      <div class="tweet-meta">
+        <span class="imp">76 impressions</span>
+        <span>4 likes</span>
+        <span>1 repost</span>
+        <span>1 reply</span>
+        <span>0 clicks</span>
+        <span>ER: 13.16%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 1</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>@GameStockHQ 99.99999% chance this is a scam.</div>
+      <div class="tweet-meta">
+        <span class="imp">16 impressions</span>
+        <span>1 like</span>
+        <span>1 reply</span>
+        <span>ER: 18.75%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Engagement rate hit a 4-week high: 11.9%</strong> (up from 5.8% last week and 7.8% two weeks ago). The audience that did see the tweets engaged at the highest rate of the month &mdash; people who showed up cared.</li>
+      <li><strong>Every product tweet drove URL clicks this week.</strong> 5 clicks across just 3 promotional tweets is a tighter conversion ratio than last week's "10 clicks from one viral tweet, nothing from the rest." Each of the top 4 substantive posts had a clear CTA and a clean product hook.</li>
+      <li><strong>The "Markets hate war / premiums love war" framing was the strongest tweet</strong> (307 imp, 7 likes, 3 reposts, 3 clicks). Newsjacking macro narrative + concrete APY + short timeframe vault is a repeatable formula &mdash; same playbook that worked with the Resolv tweet last week.</li>
+      <li><strong>Reposts held steady at 6</strong> despite a much smaller tweet volume. The "war / options premiums" tweet alone earned 3 reposts &mdash; the highest single-tweet repost count of the month. That's the strongest signal of organic amplification potential we've seen.</li>
+      <li><strong>The ETH bullish thesis tweet (Apr 1)</strong> earned 12.2% ER on 90 impressions with no link &mdash; shows the founder-voice / opinion content still resonates with the core followers even when reach is small.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Total impressions collapsed 86% (5,265 → 763).</strong> No tweet broke 310 impressions this week, vs two tweets above 1,800 last week. The momentum from the ETH price-comparison and Resolv newsjack tweets did not carry forward &mdash; the algorithm reset, and nothing this week earned a boost.</li>
+      <li><strong>Posting volume dropped to 5 tweets in 7 days</strong> &mdash; the lowest weekly count in the dataset. There were no tweets on Apr 2, Apr 4, or Apr 5. Three blank days at the end of the week is the most likely cause of the impressions cliff.</li>
+      <li><strong>Bookmarks fell to 1 (vs 4 last week, 7 two weeks ago).</strong> None of the product tweets earned a save. Without the curation/resource format that drove bookmarks in prior weeks, there's nothing for followers to file away &mdash; everything this week was a pitch.</li>
+      <li><strong>Zero new follows for the second week running.</strong> The biggest tweet (307 imp) converted nobody. Reach is shrinking and so is profile-conversion appeal &mdash; without new followers, future ceiling keeps lowering.</li>
+      <li><strong>The week was 100% product tweets (4 of 5 substantive posts pitch Prodigy vaults).</strong> No commentary, no curation, no charts, no threads &mdash; the Mar 27 ETH-comparison winner from last week was a data-driven observation, not a pitch. Pure-pitch weeks underperform.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Get back to 7+ tweets, no blank days.</strong> The 3-day silence at the end of the week killed reach. Pre-schedule at least one tweet per day &mdash; even a one-liner or screenshot. Consistency is the single biggest lever right now.</li>
+      <li><strong>Bring back the "ETH was the same price X days ago" data tweet.</strong> It was the account's all-time best performer (2,100+ imp, 10 clicks). With ETH still chopping, the data is fresh again. Make it a recurring Monday post.</li>
+      <li><strong>Mix 1 product pitch with 2 non-pitches.</strong> Five pitches in five tweets is too thin. Curation lists, market commentary, and founder takes drove last week's wins. Aim for a 1:2 promo:value ratio.</li>
+      <li><strong>Lean harder into the "war premiums" angle.</strong> It was this week's only tweet to break 300 imp and earned the highest repost count of the month. Do a follow-up with a chart of how options premiums spiked, or a vault APY screenshot tied to the same theme.</li>
+      <li><strong>Add a clear CTA + link to every product tweet.</strong> The "ETH bullish" tweet (90 imp, 12% ER) had no link &mdash; it could have driven traffic. Even high-ER organic tweets should give engaged readers somewhere to go.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Apr 3</td>
+            <td>Markets hate war. Options premiums love war&hellip;</td>
+            <td class="num">307</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">7.49</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Mar 31</td>
+            <td>It's a bear market for yields&hellip; except on Prodigy&hellip;</td>
+            <td class="num">274</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">2</td>
+            <td class="num">7.66</td>
+          </tr>
+          <tr>
+            <td>Apr 1</td>
+            <td>At Prodigy we're long term bullish on ETH&hellip;</td>
+            <td class="num">90</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">12.22</td>
+          </tr>
+          <tr>
+            <td>Mar 30</td>
+            <td>Funding rates, which were negative in past weeks&hellip;</td>
+            <td class="num">76</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">13.16</td>
+          </tr>
+          <tr>
+            <td>Apr 1</td>
+            <td>@GameStockHQ 99.99999% chance this is a scam.</td>
+            <td class="num">16</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">18.75</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Apr 7, 2026 &middot; Yield Maxi / Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
