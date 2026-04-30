@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Analytics — Week of Apr 20 – Apr 26, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Yield Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Apr 20 &ndash; Apr 26, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">6</div>
+      <div class="label">Tweets</div>
+      <div class="delta flat">0% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">897</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">-30% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">150</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">-30% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">25</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+9% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">8.1%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">-33% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">4</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">-43% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apr 20&ndash;26 (this week)</td>
+            <td class="num">6</td>
+            <td class="num">897</td>
+            <td class="num">150</td>
+            <td class="num">25</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">8.1%</td>
+          </tr>
+          <tr>
+            <td>Apr 13&ndash;19 (last week)</td>
+            <td class="num">6</td>
+            <td class="num">1,280</td>
+            <td class="num">213</td>
+            <td class="num">23</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">7</td>
+            <td class="num">12.0%</td>
+          </tr>
+          <tr>
+            <td>Apr 6&ndash;12 (2 wks ago)</td>
+            <td class="num">8</td>
+            <td class="num">3,160</td>
+            <td class="num">395</td>
+            <td class="num">46</td>
+            <td class="num">10</td>
+            <td class="num">2</td>
+            <td class="num">3</td>
+            <td class="num">10</td>
+            <td class="num">8.3%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 22</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>In DeFi, you need to make sure you&rsquo;re rewarded for the risk you take. How does 40% APY sound on your stablecoins&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">284 impressions</span>
+        <span>6 likes</span>
+        <span>4 reposts</span>
+        <span>4 URL clicks</span>
+        <span>ER: 15.49%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 21</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>When farming yield, always understand where your yield is coming from. If you can&rsquo;t explain it, you probably shouldn&rsquo;t be in it&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">174 impressions</span>
+        <span>3 likes</span>
+        <span>0 reposts</span>
+        <span>0 clicks</span>
+        <span>ER: 2.3%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 20</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>At prodigy.fi, our yield doesn&rsquo;t depend on sketchy bridge tokens, artificial incentives, or unsustainable models&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">155 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 clicks</span>
+        <span>ER: 6.45%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 23</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>Maple Finance&rsquo;s Syrup USDC and USDT offer low risk on-chain yields around 4-5% from institutional lending&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">131 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 clicks</span>
+        <span>ER: 6.87%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 24</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>Keno provides one of the best weekly yield threads on twitter&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">115 impressions</span>
+        <span>4 likes</span>
+        <span>0 reposts</span>
+        <span>0 clicks</span>
+        <span>ER: 9.57%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Likes increased 9% (23 &rarr; 25) despite a 30% drop in impressions.</strong> The like-to-impression ratio jumped from 1.8% to 2.8%, meaning tweets resonated more deeply with the audience that did see them.</li>
+      <li><strong>The &ldquo;40% APY&rdquo; tweet dominated the week at 284 impressions with 15.49% ER.</strong> Specific yield numbers + a direct value proposition drove the best engagement of the week and all 4 URL clicks. Concrete numbers outperform abstract advice.</li>
+      <li><strong>Replies increased with the Keno shoutout tweet (2 replies).</strong> Community engagement tweets that tag other DeFi voices are generating conversations, which is a healthy signal for building network effects.</li>
+      <li><strong>Consistent posting cadence of 6 tweets/week.</strong> Matching last week&rsquo;s output shows discipline. The account is settling into a sustainable rhythm.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Three-week downtrend in impressions: 3,160 &rarr; 1,280 &rarr; 897.</strong> Total reach has declined 72% over three weeks. The account hasn&rsquo;t had a breakout tweet since the Apr 6&ndash;12 period. Volume alone won&rsquo;t fix this &mdash; the account needs a high-reach macro tweet to reset the algorithm.</li>
+      <li><strong>Reposts halved (8 &rarr; 4) and bookmarks dropped to zero.</strong> Only the top tweet earned reposts. The educational and shoutout tweets aren&rsquo;t shareable enough &mdash; they lack the &ldquo;I need to save this&rdquo; or &ldquo;my followers need to see this&rdquo; quality.</li>
+      <li><strong>Only 1 of 6 tweets generated URL clicks.</strong> The &ldquo;40% APY&rdquo; tweet got all 4 clicks. The other 5 tweets had zero clicks, including the prodigy.fi product mention (155 imp, 0 clicks). Generic yield wisdom without a clear CTA doesn&rsquo;t convert.</li>
+      <li><strong>The &ldquo;looping strategies&rdquo; tweet flopped at 38 impressions.</strong> This was the second tweet on Apr 22 and got buried. Double-posting on the same day cannibalizes reach &mdash; the algorithm likely suppressed the second post.</li>
+      <li><strong>Engagement rate dropped from 12.0% to 8.1%.</strong> Despite the likes increase, overall engagement (clicks, expands, profile visits) declined, suggesting the audience is scrolling past rather than deeply interacting.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Lead with a bold macro take early in the week.</strong> The Apr 6&ndash;12 high-water mark was driven by macro-timing tweets. Open the week with a strong market opinion or contrarian take to reset the algorithm&rsquo;s distribution of your content.</li>
+      <li><strong>Include a link and CTA in every product-related tweet.</strong> The only tweet with clicks was the one with &ldquo;40% APY&rdquo; + an implied link. Never mention Prodigy vaults or rates without a direct &ldquo;check it out&rdquo; CTA and a link.</li>
+      <li><strong>Avoid double-posting on the same day.</strong> The Apr 22 second tweet (38 imp) got crushed. Space tweets at least 18-24 hours apart, or pair a text post in the morning with a reply/quote later in the day.</li>
+      <li><strong>Make educational tweets more bookmark-worthy.</strong> The &ldquo;understand where your yield comes from&rdquo; tweet (174 imp) is solid advice but too generic. Add a numbered list, a comparison chart, or a specific example to make it save-worthy.</li>
+      <li><strong>Increase to 8+ tweets/week.</strong> 6 tweets/week is the floor, not the ceiling. The Apr 6&ndash;12 week had 8 tweets and 3,160 impressions. Add daily vault rate updates or quick market reaction tweets to boost volume without sacrificing quality.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Apr 22</td>
+            <td>In DeFi, you need to make sure you&rsquo;re rewarded for the risk&hellip;</td>
+            <td class="num">284</td>
+            <td class="num">6</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">15.49</td>
+          </tr>
+          <tr>
+            <td>Apr 21</td>
+            <td>When farming yield, always understand where your yield is coming from&hellip;</td>
+            <td class="num">174</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2.30</td>
+          </tr>
+          <tr>
+            <td>Apr 20</td>
+            <td>At prodigy.fi, our yield doesn&rsquo;t depend on sketchy bridge tokens&hellip;</td>
+            <td class="num">155</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.45</td>
+          </tr>
+          <tr>
+            <td>Apr 23</td>
+            <td>Maple Finance&rsquo;s Syrup USDC and USDT offer low risk yields&hellip;</td>
+            <td class="num">131</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.87</td>
+          </tr>
+          <tr>
+            <td>Apr 24</td>
+            <td>Keno provides one of the best weekly yield threads&hellip;</td>
+            <td class="num">115</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">9.57</td>
+          </tr>
+          <tr>
+            <td>Apr 22</td>
+            <td>Looping strategies are really great &hellip; until they aren&rsquo;t&hellip;</td>
+            <td class="num">38</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.89</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Apr 30, 2026 &middot; Yield Maxi / Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
