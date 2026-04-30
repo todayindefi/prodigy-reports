@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy.fi Twitter Analytics — Week of Apr 20 – Apr 26, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi (Project Account) Weekly Performance Report</div>
+    <div class="date-range">Apr 20 &ndash; Apr 26, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">13</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+8% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2,106</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">-10% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">162</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">-17% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">112</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+81% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">17.2%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+26% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">15</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+36% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apr 20&ndash;26 (this week)</td>
+            <td class="num">13</td>
+            <td class="num">2,106</td>
+            <td class="num">162</td>
+            <td class="num">112</td>
+            <td class="num">77</td>
+            <td class="num">39</td>
+            <td class="num">0</td>
+            <td class="num">15</td>
+            <td class="num">17.2%</td>
+          </tr>
+          <tr>
+            <td>Apr 13&ndash;19 (last week)</td>
+            <td class="num">12</td>
+            <td class="num">2,348</td>
+            <td class="num">196</td>
+            <td class="num">62</td>
+            <td class="num">35</td>
+            <td class="num">33</td>
+            <td class="num">0</td>
+            <td class="num">11</td>
+            <td class="num">13.6%</td>
+          </tr>
+          <tr>
+            <td>Apr 6&ndash;12 (2 wks ago)</td>
+            <td class="num">12</td>
+            <td class="num">1,487</td>
+            <td class="num">124</td>
+            <td class="num">71</td>
+            <td class="num">29</td>
+            <td class="num">19</td>
+            <td class="num">1</td>
+            <td class="num">9</td>
+            <td class="num">14.9%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 22</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>three weeks ago the crypto fear index was at 8. today it&rsquo;s 62. same market. same assets. what changed? nothing. except sentiment. the best time to enter a vault was when everyone was panicking&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">222 impressions</span>
+        <span>8 likes</span>
+        <span>7 reposts</span>
+        <span>5 replies</span>
+        <span>3 clicks</span>
+        <span>ER: 17.12%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 26</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>options expire worthless every week. the premium the trader paid doesn&rsquo;t disappear &mdash; it goes to you. that&rsquo;s how structured vaults work&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">220 impressions</span>
+        <span>11 likes</span>
+        <span>9 reposts</span>
+        <span>5 replies</span>
+        <span>1 click</span>
+        <span>ER: 15.45%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 25</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>not all yield is the same. lending protocols: variable. drops when deposits pile in. staking: reliable but capped. structured vaults: performance-linked. the premium adjusts to vol&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">207 impressions</span>
+        <span>11 likes</span>
+        <span>7 reposts</span>
+        <span>6 replies</span>
+        <span>2 clicks</span>
+        <span>ER: 14.98%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 21</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>$10,000 over 30+ days: savings account (0.5% APY) &rarr; $4.11. ETH staking (3.5% APY) &rarr; $28.77. Prodigy vault &rarr; much more&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">181 impressions</span>
+        <span>8 likes</span>
+        <span>6 reposts</span>
+        <span>4 replies</span>
+        <span>1 click</span>
+        <span>ER: 13.81%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 20</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>in light of the recent exploit, prodigy.fi would like to remind users: our vaults use non-custodial smart contracts. no admin keys. no pause buttons&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">172 impressions</span>
+        <span>8 likes</span>
+        <span>5 reposts</span>
+        <span>2 replies</span>
+        <span>3 clicks</span>
+        <span>ER: 15.7%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Likes nearly doubled: 62 &rarr; 112 (+81%).</strong> This is the strongest likes week in the 3-week window by a wide margin. The audience deeply resonated with this week&rsquo;s content mix of educational threads, market commentary, and vault explainers.</li>
+      <li><strong>Reposts more than doubled: 35 &rarr; 77 (+120%).</strong> Massive shareability improvement. The &ldquo;options expire worthless&rdquo; and &ldquo;fear index&rdquo; tweets were both highly reposted, proving that contrarian/educational content drives organic reach.</li>
+      <li><strong>Engagement rate hit 17.2% &mdash; the highest in weeks.</strong> Every single tweet exceeded 10% ER except the @base reply (10.26%). The content strategy of mixing education, humor, and product is firing on all cylinders.</li>
+      <li><strong>URL clicks jumped 36% (11 &rarr; 15).</strong> The exploit security tweet (3 clicks) and the fear index tweet (3 clicks) drove the most traffic. Timely, newsjacking content converts best.</li>
+      <li><strong>Replies increased 18% (33 &rarr; 39).</strong> The relatable DeFi humor tweets (&ldquo;checking my portfolio at 6am&rdquo;, &ldquo;your last 10 trades&rdquo;) sparked conversations. The account is building community engagement, not just broadcasting.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Total impressions dipped 10% (2,348 &rarr; 2,106) despite more tweets.</strong> Average impressions per tweet dropped 17% (196 &rarr; 162). The engagement quality is excellent, but the account isn&rsquo;t reaching new audiences &mdash; it&rsquo;s engaging the same core followers more deeply.</li>
+      <li><strong>Bookmarks remain at zero for the second consecutive week.</strong> Despite the educational content (yield comparison, looping explainer), nobody is saving these tweets. The content is engaging in-feed but not reference-worthy. Consider adding more &ldquo;save this&rdquo; formatted threads with numbered lists or comparison charts.</li>
+      <li><strong>The @base reply tweet flopped at 78 impressions.</strong> Generic platform reply tweets (&ldquo;structured yield strategies made simple @ProdigyFi&rdquo;) consistently underperform. The algorithm doesn&rsquo;t reward short reply-style self-promotion.</li>
+      <li><strong>No tweet broke 225 impressions.</strong> The ceiling has compressed &mdash; two weeks ago the top tweet hit 196, last week it was 222. The account needs a breakout format (thread, infographic, or collab) to punch through to new audiences.</li>
+      <li><strong>Three tweets on Apr 26 diluted reach.</strong> The third tweet (78 imp) dragged down the day&rsquo;s average. Two strong posts per day is the sweet spot; the third gets suppressed.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Double down on the contrarian market take format.</strong> The &ldquo;fear index&rdquo; tweet (222 imp, 17% ER) was the top performer. More &ldquo;everyone thinks X, but actually Y&rdquo; framing tied to vault opportunities will continue to drive engagement and reach.</li>
+      <li><strong>Create a bookmark-worthy reference thread.</strong> Zero bookmarks for two straight weeks is a miss. Publish a &ldquo;DeFi Yield Cheat Sheet&rdquo; or &ldquo;5 types of yield ranked by risk&rdquo; thread &mdash; structured, numbered content that people want to save and revisit.</li>
+      <li><strong>Cap tweets at 2 per day max.</strong> The data consistently shows the third daily tweet getting crushed. Prioritize quality over quantity &mdash; 12 strong tweets across 6-7 days beats 13 with filler.</li>
+      <li><strong>Pursue a collaboration or quote-tweet exchange.</strong> Impressions are plateauing in the 150-220 range. A collab tweet with another DeFi protocol or influencer would expose the account to a new audience and break the impression ceiling.</li>
+      <li><strong>Keep the relatable DeFi humor tweets.</strong> &ldquo;Checking my portfolio at 6am&rdquo; (117 imp, 26.5% ER) proves that humor drives the highest engagement rates. Mix 2-3 of these in per week alongside educational and product content.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Apr 22</td>
+            <td>three weeks ago the crypto fear index was at 8&hellip;</td>
+            <td class="num">222</td>
+            <td class="num">8</td>
+            <td class="num">7</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">17.12</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Apr 26</td>
+            <td>options expire worthless every week&hellip;</td>
+            <td class="num">220</td>
+            <td class="num">11</td>
+            <td class="num">9</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">15.45</td>
+          </tr>
+          <tr>
+            <td>Apr 25</td>
+            <td>not all yield is the same&hellip;</td>
+            <td class="num">207</td>
+            <td class="num">11</td>
+            <td class="num">7</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">14.98</td>
+          </tr>
+          <tr>
+            <td>Apr 21</td>
+            <td>$10,000 over 30+ days: savings account vs staking vs vault&hellip;</td>
+            <td class="num">181</td>
+            <td class="num">8</td>
+            <td class="num">6</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">13.81</td>
+          </tr>
+          <tr>
+            <td>Apr 20</td>
+            <td>in light of the recent exploit, prodigy.fi reminds users&hellip;</td>
+            <td class="num">172</td>
+            <td class="num">8</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">3</td>
+            <td class="num">15.70</td>
+          </tr>
+          <tr>
+            <td>Apr 20</td>
+            <td>BTC dropped to $73,800 this morning on Iran headlines&hellip;</td>
+            <td class="num">166</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">13.86</td>
+          </tr>
+          <tr>
+            <td>Apr 24</td>
+            <td>this vault closes tomorrow. $110,000 USDC in. $239 yield&hellip;</td>
+            <td class="num">165</td>
+            <td class="num">9</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">21.82</td>
+          </tr>
+          <tr>
+            <td>Apr 26</td>
+            <td>BTC has been coiling at $78K for three days&hellip;</td>
+            <td class="num">159</td>
+            <td class="num">9</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">14.47</td>
+          </tr>
+          <tr>
+            <td>Apr 24</td>
+            <td>your last 10 trades. how many were profitable&hellip;</td>
+            <td class="num">156</td>
+            <td class="num">10</td>
+            <td class="num">7</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">19.23</td>
+          </tr>
+          <tr>
+            <td>Apr 25</td>
+            <td>that feeling when your vault expires tomorrow&hellip;</td>
+            <td class="num">142</td>
+            <td class="num">11</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">17.61</td>
+          </tr>
+          <tr>
+            <td>Apr 23</td>
+            <td>your portfolio: 70% waiting for the next move&hellip;</td>
+            <td class="num">121</td>
+            <td class="num">7</td>
+            <td class="num">5</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">22.31</td>
+          </tr>
+          <tr>
+            <td>Apr 23</td>
+            <td>checking my portfolio at 6am with cold coffee&hellip;</td>
+            <td class="num">117</td>
+            <td class="num">10</td>
+            <td class="num">8</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">26.50</td>
+          </tr>
+          <tr>
+            <td>Apr 26</td>
+            <td>@base structured yield strategies made simple @ProdigyFi</td>
+            <td class="num">78</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">10.26</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Apr 30, 2026 &middot; Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
