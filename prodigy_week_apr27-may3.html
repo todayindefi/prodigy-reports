@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy.fi Twitter Analytics — Week of Apr 27 – May 3, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi (Project Account) Weekly Performance Report</div>
+    <div class="date-range">Apr 27 &ndash; May 3, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">21</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+62% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">14,957</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+610% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">712</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta up">+340% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">167</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+49% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">9.6%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">-44% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">23</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+53% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apr 27&ndash;May 3 (this week)</td>
+            <td class="num">21</td>
+            <td class="num">14,957</td>
+            <td class="num">712</td>
+            <td class="num">167</td>
+            <td class="num">83</td>
+            <td class="num">34</td>
+            <td class="num">1</td>
+            <td class="num">23</td>
+            <td class="num">9.6%</td>
+          </tr>
+          <tr>
+            <td>Apr 20&ndash;26 (last week)</td>
+            <td class="num">13</td>
+            <td class="num">2,106</td>
+            <td class="num">162</td>
+            <td class="num">112</td>
+            <td class="num">77</td>
+            <td class="num">39</td>
+            <td class="num">0</td>
+            <td class="num">15</td>
+            <td class="num">17.2%</td>
+          </tr>
+          <tr>
+            <td>Apr 13&ndash;19 (2 wks ago)</td>
+            <td class="num">12</td>
+            <td class="num">2,348</td>
+            <td class="num">196</td>
+            <td class="num">62</td>
+            <td class="num">35</td>
+            <td class="num">33</td>
+            <td class="num">0</td>
+            <td class="num">11</td>
+            <td class="num">13.6%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 29</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>prodigy.fi V2 just dropped&hellip; (V2 LAUNCH announcement)</div>
+      <div class="tweet-meta">
+        <span class="imp">11,698 impressions</span>
+        <span>31 likes</span>
+        <span>11 reposts</span>
+        <span>10 replies</span>
+        <span>1 bookmark</span>
+        <span>12 clicks</span>
+        <span>ER: 1.39%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 29</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Link tweet (sCrhKvrF4f) &mdash; V2 link share</div>
+      <div class="tweet-meta">
+        <span class="imp">437 impressions</span>
+        <span>11 likes</span>
+        <span>6 reposts</span>
+        <span>0 replies</span>
+        <span>2 clicks</span>
+        <span>ER: 10.76%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 27</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>we&rsquo;ve been rebuilding. v2 is almost here&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">437 impressions</span>
+        <span>16 likes</span>
+        <span>7 reposts</span>
+        <span>4 replies</span>
+        <span>0 clicks</span>
+        <span>ER: 15.33%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 2</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>V2 has a clean mode. browse vaults, compare payoffs&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">337 impressions</span>
+        <span>14 likes</span>
+        <span>8 reposts</span>
+        <span>1 reply</span>
+        <span>0 clicks</span>
+        <span>ER: 9.50%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 29</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>more details on the improved features here:&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">281 impressions</span>
+        <span>6 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 clicks</span>
+        <span>ER: 3.20%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>V2 launch tweet was a historic breakout: 11,698 impressions.</strong> This is by far the highest-performing tweet in the account&rsquo;s history &mdash; nearly 53x the previous week&rsquo;s top tweet (222 imp). The announcement format with a clear product milestone drove massive organic reach.</li>
+      <li><strong>Total impressions exploded +610% (2,106 &rarr; 14,957).</strong> The V2 launch week shattered every previous impression record. Even excluding the V2 announcement tweet, the remaining 20 tweets averaged 163 impressions &mdash; on par with last week&rsquo;s average, proving the baseline content remained strong.</li>
+      <li><strong>URL clicks nearly doubled: 15 &rarr; 23 (+53%).</strong> The V2 launch tweet alone drove 12 clicks, but product-focused tweets like the ETH vault tweet (1 click), market maker tweet (1 click), and USDC yield tweet (4 clicks) also converted. Product launches drive traffic.</li>
+      <li><strong>First bookmark in weeks.</strong> The V2 launch tweet earned the account&rsquo;s first bookmark since the Apr 6&ndash;12 period. Milestone announcements are &ldquo;save-worthy&rdquo; content &mdash; a format worth repeating for future launches.</li>
+      <li><strong>2 new follows acquired.</strong> The V2 launch brought in new followers for the first time in the tracking window. This confirms that breakout tweets with broad reach do convert to audience growth.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Average engagement rate dropped 44% (17.2% &rarr; 9.6%).</strong> The V2 launch tweet had only 1.39% ER despite massive reach &mdash; a classic broadcast-style trade-off. When a tweet reaches far beyond the core audience, ER naturally compresses. This isn&rsquo;t a content quality issue, but it&rsquo;s worth noting.</li>
+      <li><strong>Reply tweets got minimal traction.</strong> The 7 reply tweets (ranging from 1 to 46 impressions) contributed almost nothing to engagement totals. Launch-day replies like follow-up context tweets were buried by the algorithm. Replies should be reserved for high-value conversations, not used as content distribution.</li>
+      <li><strong>8 tweets on Apr 29 diluted per-tweet reach.</strong> Launch day saw 8 tweets published (the announcement + follow-ups + replies). While understandable for a product launch, the volume likely caused algorithmic suppression on the lower-performing posts. The &ldquo;more details&rdquo; tweet got only 281 impressions and 3.2% ER despite being tied to the launch.</li>
+      <li><strong>Replies decreased 13% (39 &rarr; 34).</strong> Despite a massive reach increase, actual conversation (replies from others) went down. The V2 content was more broadcast-oriented and less conversation-starting than last week&rsquo;s humor and relatable content.</li>
+      <li><strong>Non-V2 tweets didn&rsquo;t benefit from the launch halo.</strong> Tweets on May 1&ndash;3 (post-launch) averaged just 177 impressions &mdash; barely above last week&rsquo;s 162 average. The V2 launch didn&rsquo;t create a lasting lift in organic reach for subsequent tweets.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Capitalize on V2 momentum with follow-up content.</strong> The launch generated 2 new follows and 11,698 impressions. Publish specific V2 feature walkthroughs, user testimonials, and vault performance comparisons to convert the new audience into engaged followers. Strike while the iron is hot.</li>
+      <li><strong>Continue the high-ER educational format.</strong> Tweets like &ldquo;$327.60 over 2 days&rdquo; (20.79% ER), &ldquo;be honest, your portfolio is&rdquo; (19.50% ER), and &ldquo;Fear &amp; Greed index&rdquo; (17.97% ER) prove that educational and relatable content still drives the best engagement rates. Mix 2&ndash;3 of these per week alongside V2 content.</li>
+      <li><strong>Reduce reply tweet volume.</strong> The 7 reply tweets this week averaged just 23 impressions. Reserve replies for high-value conversations with other accounts &mdash; don&rsquo;t use them to add context that could be included in the original tweet or a thread.</li>
+      <li><strong>Cap daily tweets at 2&ndash;3 originals max.</strong> The Apr 29 flood of 8 tweets showed diminishing returns. Focus on 2 strong original tweets per day and let each one breathe in the algorithm before posting the next.</li>
+      <li><strong>Create a V2 feature thread to chase the bookmark metric.</strong> The V2 launch earned the first bookmark in weeks. Follow up with a &ldquo;5 things you can do in V2 that you couldn&rsquo;t before&rdquo; thread &mdash; structured, numbered content that people will save as a reference.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Apr 29</td>
+            <td>prodigy.fi V2 just dropped&hellip; (V2 LAUNCH)</td>
+            <td class="num">11,698</td>
+            <td class="num">31</td>
+            <td class="num">11</td>
+            <td class="num">10</td>
+            <td class="num">12</td>
+            <td class="num">1.39</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Apr 29</td>
+            <td>Link tweet (sCrhKvrF4f) &mdash; V2 link share</td>
+            <td class="num">437</td>
+            <td class="num">11</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">10.76</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Apr 27</td>
+            <td>we&rsquo;ve been rebuilding. v2 is almost here&hellip;</td>
+            <td class="num">437</td>
+            <td class="num">16</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">15.33</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 2</td>
+            <td>V2 has a clean mode. browse vaults, compare payoffs&hellip;</td>
+            <td class="num">337</td>
+            <td class="num">14</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">9.50</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Apr 29</td>
+            <td>more details on the improved features here:&hellip;</td>
+            <td class="num">281</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">3.20</td>
+          </tr>
+          <tr>
+            <td>Apr 30</td>
+            <td>ETH is sitting at $2,258 right now. this sell high vault&hellip;</td>
+            <td class="num">232</td>
+            <td class="num">11</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">9.91</td>
+          </tr>
+          <tr>
+            <td>Apr 28</td>
+            <td>most people read &lsquo;linked price&rsquo; and think it&rsquo;s a price target&hellip;</td>
+            <td class="num">206</td>
+            <td class="num">11</td>
+            <td class="num">6</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">16.99</td>
+          </tr>
+          <tr>
+            <td>May 1</td>
+            <td>before V2, vault APY was a standardized estimate&hellip;</td>
+            <td class="num">202</td>
+            <td class="num">9</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">12.38</td>
+          </tr>
+          <tr>
+            <td>Apr 28</td>
+            <td>be honest. right now your crypto portfolio is:&hellip;</td>
+            <td class="num">200</td>
+            <td class="num">10</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">19.50</td>
+          </tr>
+          <tr>
+            <td>Apr 27</td>
+            <td>$327.60 over 2 days. that&rsquo;s $163 a day on $100,000 USDC&hellip;</td>
+            <td class="num">178</td>
+            <td class="num">9</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">4</td>
+            <td class="num">20.79</td>
+          </tr>
+          <tr>
+            <td>May 3</td>
+            <td>spent the week watching BTC bounce between $76K and $79K&hellip;</td>
+            <td class="num">164</td>
+            <td class="num">9</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">17.07</td>
+          </tr>
+          <tr>
+            <td>Apr 30</td>
+            <td>market makers don&rsquo;t predict price. they collect spread&hellip;</td>
+            <td class="num">157</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">10.83</td>
+          </tr>
+          <tr>
+            <td>Apr 29</td>
+            <td>the SEC just ended regulation through enforcement&hellip;</td>
+            <td class="num">137</td>
+            <td class="num">10</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">13.14</td>
+          </tr>
+          <tr>
+            <td>May 1</td>
+            <td>three weeks ago the Fear &amp; Greed index was at 8&hellip;</td>
+            <td class="num">128</td>
+            <td class="num">10</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">17.97</td>
+          </tr>
+          <tr>
+            <td>Apr 29</td>
+            <td>@reply &mdash; V2 launch reply thread (46 imp)</td>
+            <td class="num">46</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Apr 29</td>
+            <td>@reply &mdash; V2 launch reply thread (41 imp)</td>
+            <td class="num">41</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Apr 29</td>
+            <td>@reply &mdash; V2 launch reply thread (33 imp)</td>
+            <td class="num">33</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Apr 30</td>
+            <td>@reply (20 imp)</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Apr 29</td>
+            <td>@reply &mdash; V2 launch reply thread (20 imp)</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Apr 29</td>
+            <td>@reply &mdash; V2 launch reply thread (2 imp)</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Apr 30</td>
+            <td>@reply (1 imp)</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated May 7, 2026 &middot; Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
