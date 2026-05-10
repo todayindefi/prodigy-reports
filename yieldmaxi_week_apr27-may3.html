@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Analytics — Week of Apr 27 – May 3, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Yield Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Apr 27 &ndash; May 3, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">4</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">-33% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">517</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">-42% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">129</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">-14% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">14</div>
+      <div class="label">Likes</div>
+      <div class="delta down">-44% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">6.1%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">-25% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">-50% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apr 27&ndash;May 3 (this week)</td>
+            <td class="num">4</td>
+            <td class="num">517</td>
+            <td class="num">129</td>
+            <td class="num">14</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">6.1%</td>
+          </tr>
+          <tr>
+            <td>Apr 20&ndash;26 (last week)</td>
+            <td class="num">6</td>
+            <td class="num">897</td>
+            <td class="num">150</td>
+            <td class="num">25</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">8.1%</td>
+          </tr>
+          <tr>
+            <td>Apr 13&ndash;19 (2 wks ago)</td>
+            <td class="num">6</td>
+            <td class="num">1,280</td>
+            <td class="num">213</td>
+            <td class="num">23</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">7</td>
+            <td class="num">12.0%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 27</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>One of the best things you can do to reduce your farming portfolio risk is to diversify yield sources. prodigy.fi has strong audits, and non-correlated yield&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">302 impressions</span>
+        <span>5 likes</span>
+        <span>2 reposts</span>
+        <span>2 URL clicks</span>
+        <span>ER: 5.63%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 28</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>We&rsquo;ve been heads down building to make the Prodigy experience better. Looking forward to announcing soon.</div>
+      <div class="tweet-meta">
+        <span class="imp">104 impressions</span>
+        <span>4 likes</span>
+        <span>1 repost</span>
+        <span>0 clicks</span>
+        <span>ER: 6.73%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 30</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>Team has worked hard on V2 for months. Now we&rsquo;re finally ready to showcase it. Better UI, Better Pricing, more Flexibility.</div>
+      <div class="tweet-meta">
+        <span class="imp">68 impressions</span>
+        <span>3 likes</span>
+        <span>0 reposts</span>
+        <span>0 clicks</span>
+        <span>ER: 7.35%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Apr 30</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>reply @Nomaticcap Speaking of Onchain Options &hellip; We just launched our V2!</div>
+      <div class="tweet-meta">
+        <span class="imp">43 impressions</span>
+        <span>2 likes</span>
+        <span>0 reposts</span>
+        <span>0 clicks</span>
+        <span>ER: 4.65%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>The &ldquo;diversify yield sources&rdquo; tweet led the week at 302 impressions.</strong> This was the only tweet to break 200 impressions, showing that practical risk-management advice paired with a Prodigy mention still resonates with the audience.</li>
+      <li><strong>2 URL clicks came from the founder account this week.</strong> Both clicks came from the diversification tweet, confirming that product mentions with a clear value proposition (audits, non-correlated yield) can drive traffic even at lower volumes.</li>
+      <li><strong>The &ldquo;heads down building&rdquo; tweet earned the second-highest engagement rate at 6.73%.</strong> Teaser-style content about upcoming announcements generates curiosity and engagement, suggesting the audience cares about Prodigy product updates from the founder&rsquo;s voice.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Only 4 tweets posted &mdash; the lowest cadence to date (down 33% from 6).</strong> V2 launch week should have been the highest-volume week, not the lowest. The founder account was nearly silent during the most important product milestone of the quarter.</li>
+      <li><strong>Four-week downtrend in impressions continues: 3,160 &rarr; 1,280 &rarr; 897 &rarr; 517.</strong> Total reach has now declined 84% over four weeks. Each week sets a new low. The algorithm is deprioritizing this account due to declining activity and engagement signals.</li>
+      <li><strong>V2 launch was barely promoted from the founder account.</strong> The founder&rsquo;s V2 announcement tweet (68 impressions) was massively outperformed by the @ProdigyFi V2 launch tweet (11,698 impressions). The founder should have been the first and loudest voice on V2, adding personal context and excitement the brand account can&rsquo;t provide.</li>
+      <li><strong>Engagement rate continues to decline: 12.0% &rarr; 8.1% &rarr; 6.1%.</strong> The three-week ER slide indicates the remaining audience is losing interest. The content mix lacks the bold opinions and personal takes that drive deeper interaction.</li>
+      <li><strong>Zero bookmarks for the third consecutive week.</strong> None of the 4 tweets were considered save-worthy. The content is too brief and generic to trigger the &ldquo;I need to reference this later&rdquo; impulse.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Increase to 8+ tweets per week immediately.</strong> Four tweets is unacceptable, especially during a product launch. Target at least one tweet per day plus additional replies and quote tweets to rebuild algorithm momentum.</li>
+      <li><strong>The founder should have been the FIRST to announce V2 with personal takes.</strong> For any future launches, the founder account must lead the narrative &mdash; share the personal story behind the build, what&rsquo;s different, why it matters &mdash; before the brand account posts. Personal conviction from a founder carries more weight than a corporate announcement.</li>
+      <li><strong>Post more opinionated and personal content.</strong> The best-performing weeks featured bold market takes and contrarian opinions. Generic yield advice is getting buried. Share personal portfolio decisions, hot takes on market events, and lessons learned from building Prodigy.</li>
+      <li><strong>Create a V2 content series this week to recapture lost momentum.</strong> The V2 launch was under-leveraged. Post a thread breaking down V2 features, a before/after comparison, user testimonials, or a &ldquo;why we built this&rdquo; narrative to extend the launch window.</li>
+      <li><strong>Include a link and CTA in every product-related tweet.</strong> The diversification tweet earned the only 2 clicks because it had a clear value prop. Every Prodigy mention needs a direct &ldquo;try it now&rdquo; or &ldquo;check it out&rdquo; call to action with a link.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Apr 27</td>
+            <td>One of the best things you can do to reduce your farming portfolio risk&hellip;</td>
+            <td class="num">302</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">5.63</td>
+          </tr>
+          <tr>
+            <td>Apr 28</td>
+            <td>We&rsquo;ve been heads down building to make the Prodigy experience better&hellip;</td>
+            <td class="num">104</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.73</td>
+          </tr>
+          <tr>
+            <td>Apr 30</td>
+            <td>Team has worked hard on V2 for months. Now we&rsquo;re finally ready&hellip;</td>
+            <td class="num">68</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.35</td>
+          </tr>
+          <tr>
+            <td>Apr 30</td>
+            <td>reply @Nomaticcap Speaking of Onchain Options &hellip; We just launched our V2!</td>
+            <td class="num">43</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">4.65</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated May 7, 2026 &middot; Yield Maxi / Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
