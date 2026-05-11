@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy.fi Twitter Analytics — Week of May 4 – May 10, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi (Project Account) Weekly Performance Report</div>
+    <div class="date-range">May 4 &ndash; May 10, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">14</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">-33% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,506</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">-90% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">108</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">-85% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">118</div>
+      <div class="label">Likes</div>
+      <div class="delta down">-29% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">18.2%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+90% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">6</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">-75% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>May 4&ndash;10 (this week)</td>
+            <td class="num">14</td>
+            <td class="num">1,506</td>
+            <td class="num">108</td>
+            <td class="num">118</td>
+            <td class="num">67</td>
+            <td class="num">31</td>
+            <td class="num">0</td>
+            <td class="num">6</td>
+            <td class="num">18.2%</td>
+          </tr>
+          <tr>
+            <td>Apr 27&ndash;May 3 (last week)</td>
+            <td class="num">21</td>
+            <td class="num">15,340</td>
+            <td class="num">731</td>
+            <td class="num">166</td>
+            <td class="num">83</td>
+            <td class="num">34</td>
+            <td class="num">2</td>
+            <td class="num">24</td>
+            <td class="num">9.6%</td>
+          </tr>
+          <tr>
+            <td>Apr 20&ndash;26 (2 wks ago)</td>
+            <td class="num">13</td>
+            <td class="num">2,191</td>
+            <td class="num">169</td>
+            <td class="num">112</td>
+            <td class="num">77</td>
+            <td class="num">39</td>
+            <td class="num">0</td>
+            <td class="num">15</td>
+            <td class="num">17.2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 5</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>autocallable notes are sold by private banks to clients with $100,000+ minimums&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">198 impressions</span>
+        <span>12 likes</span>
+        <span>7 reposts</span>
+        <span>3 replies</span>
+        <span>1 click</span>
+        <span>ER: 16.67%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 7</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Morgan Stanley just opened crypto trading to 8.6 million E*Trade customers&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">165 impressions</span>
+        <span>11 likes</span>
+        <span>6 reposts</span>
+        <span>4 replies</span>
+        <span>1 click</span>
+        <span>ER: 21.82%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 6</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>what did holding USDC for the last 30 days actually cost you in dollar terms?</div>
+      <div class="tweet-meta">
+        <span class="imp">145 impressions</span>
+        <span>11 likes</span>
+        <span>5 reposts</span>
+        <span>8 replies</span>
+        <span>0 clicks</span>
+        <span>ER: 22.76%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 7</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>for the 0DTE traders: your book closes today&hellip; $100,000 USDC in. linked price $80,500. $195 in 20 hours.</div>
+      <div class="tweet-meta">
+        <span class="imp">139 impressions</span>
+        <span>14 likes</span>
+        <span>8 reposts</span>
+        <span>2 replies</span>
+        <span>1 click</span>
+        <span>ER: 24.46%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 5</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>one bank after another scrapped their Fed rate-cut forecasts this week. BTC hit $81,000&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">139 impressions</span>
+        <span>13 likes</span>
+        <span>6 reposts</span>
+        <span>3 replies</span>
+        <span>0 clicks</span>
+        <span>ER: 22.30%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Record-high avg engagement rate of 18.2% for a full week.</strong> This is the highest full-week ER on record, nearly doubling last week&rsquo;s 9.6% and topping the previous best of 17.2%. Every single original tweet exceeded 12% ER &mdash; the content quality bar has never been higher.</li>
+      <li><strong>Strong likes-per-tweet average of 8.4.</strong> Despite fewer tweets (14 vs 21), the account averaged 8.4 likes per tweet. The audience is responding to every post with genuine engagement, not just scrolling past.</li>
+      <li><strong>Reposts per tweet held strong at 4.8 avg.</strong> Organic shareability remains excellent. The &ldquo;weekend plans&rdquo; tweet earned 7 reposts and the &ldquo;0DTE traders&rdquo; tweet earned 8 &mdash; proving the vault-math format continues to drive shares.</li>
+      <li><strong>The &ldquo;0DTE traders&rdquo; tweet was the highest-engagement post of the week.</strong> 14 likes and 8 reposts at a 24.46% ER. Specific vault math with dollar amounts ($100,000 USDC, $195 in 20 hours) consistently outperforms abstract messaging.</li>
+      <li><strong>The &ldquo;USDC opportunity cost&rdquo; question drove 8 replies &mdash; the most discussion from a single tweet.</strong> The question format (&ldquo;what did holding USDC actually cost you?&rdquo;) sparked real conversation. This is the account&rsquo;s best reply-generating tweet to date.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Impressions have crashed post-V2 launch: 108 avg vs 169 two weeks ago (-36%).</strong> Even excluding the anomalous V2 launch week (731 avg), reach is compressing. The account is engaging existing followers deeply but not breaking through to new audiences.</li>
+      <li><strong>Zero bookmarks for the third consecutive week.</strong> Despite high-quality educational content (autocallable notes, vault mechanics), nobody is saving tweets. The content is performing well in-feed but isn&rsquo;t formatted for reference or revisiting.</li>
+      <li><strong>Only 6 URL clicks total &mdash; down 75% from last week.</strong> Traffic to the site has dried up. With no dedicated CTA tweets and no thread format to build click momentum, users are engaging but not converting to site visits.</li>
+      <li><strong>Reach has compressed to a 100&ndash;200 impression ceiling.</strong> No tweet broke 200 impressions (the top tweet hit 198). The account is talking to the same core followers every day without reaching new audiences.</li>
+      <li><strong>Two reply tweets got essentially zero engagement.</strong> The replies to @jhodybaadillah (4 imp) and @Pati37278Sunday (2 imp) generated a combined 6 impressions and 0 likes. These are wasted effort that dilute overall metrics.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Make the question format a recurring staple (1&ndash;2x/week).</strong> The &ldquo;what did USDC cost you?&rdquo; tweet drove 8 replies &mdash; by far the most discussion this week. Open-ended questions that challenge assumptions create conversation and signal engagement to the algorithm.</li>
+      <li><strong>Always include specific dollar amounts and scenarios in vault tweets.</strong> The 0DTE tweet ($100,000 USDC, $195 in 20 hours) earned 14 likes and 8 reposts. The ETH $2,250 vault tweet ($1,496 to wait) also outperformed. Concrete math consistently beats abstract product messaging.</li>
+      <li><strong>Launch a reach play: collab, thread, or infographic.</strong> The 100&ndash;200 impression ceiling won&rsquo;t break on its own. A quote-tweet exchange with another DeFi protocol, a numbered thread, or a visual comparison chart would expose the account to new audiences.</li>
+      <li><strong>Consider dropping or reducing reply tweets.</strong> Two replies this week earned a combined 6 impressions and 0 likes. Unless replying to high-visibility accounts, these posts dilute the feed and waste a posting slot. Focus energy on original content instead.</li>
+      <li><strong>Add a &ldquo;save this&rdquo; reference-format tweet to break the bookmarks drought.</strong> Three straight weeks at zero bookmarks. Try a numbered list (&ldquo;5 vault strategies ranked by risk&rdquo;) or a comparison format designed to be saved and revisited.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>May 5</td>
+            <td>autocallable notes are sold by private banks to clients with $100,000+ minimums&hellip;</td>
+            <td class="num">198</td>
+            <td class="num">12</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">16.67</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 7</td>
+            <td>Morgan Stanley just opened crypto trading to 8.6 million E*Trade customers&hellip;</td>
+            <td class="num">165</td>
+            <td class="num">11</td>
+            <td class="num">6</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">21.82</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 6</td>
+            <td>what did holding USDC for the last 30 days actually cost you in dollar terms?</td>
+            <td class="num">145</td>
+            <td class="num">11</td>
+            <td class="num">5</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">22.76</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 7</td>
+            <td>for the 0DTE traders: your book closes today&hellip; $100,000 USDC in&hellip;</td>
+            <td class="num">139</td>
+            <td class="num">14</td>
+            <td class="num">8</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">24.46</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 5</td>
+            <td>one bank after another scrapped their Fed rate-cut forecasts this week&hellip;</td>
+            <td class="num">139</td>
+            <td class="num">13</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">22.30</td>
+          </tr>
+          <tr>
+            <td>May 4</td>
+            <td>if you were planning to buy ETH somewhere around $2,250 anyway&hellip;</td>
+            <td class="num">163</td>
+            <td class="num">9</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">1</td>
+            <td class="num">12.88</td>
+          </tr>
+          <tr>
+            <td>May 6</td>
+            <td>when you pick a linked price in a ProdigyFi vault&hellip;</td>
+            <td class="num">126</td>
+            <td class="num">12</td>
+            <td class="num">7</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">19.84</td>
+          </tr>
+          <tr>
+            <td>May 4</td>
+            <td>scrolling twitter at 2am seeing people panic sell while i&rsquo;m literally asleep</td>
+            <td class="num">106</td>
+            <td class="num">8</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">17.92</td>
+          </tr>
+          <tr>
+            <td>May 9</td>
+            <td>weekend plans: let your vault work for you. enjoy the break.</td>
+            <td class="num">94</td>
+            <td class="num">11</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">29.79</td>
+          </tr>
+          <tr>
+            <td>May 8</td>
+            <td>woke up to a vault settlement notification this morning&hellip;</td>
+            <td class="num">87</td>
+            <td class="num">8</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">24.14</td>
+          </tr>
+          <tr>
+            <td>May 10</td>
+            <td>ETH is at $2,330 after a week that swung $400 in both directions&hellip;</td>
+            <td class="num">84</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">23.81</td>
+          </tr>
+          <tr>
+            <td>May 10</td>
+            <td>most trading is just reacting to things that already happened&hellip;</td>
+            <td class="num">54</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">18.52</td>
+          </tr>
+          <tr>
+            <td>May 7</td>
+            <td>reply @jhodybaadillah &mdash; which is exactly why we exist</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>May 7</td>
+            <td>reply @Pati37278Sunday &mdash; never stop letting your stables work</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated May 11, 2026 &middot; Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
