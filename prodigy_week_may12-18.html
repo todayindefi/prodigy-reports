@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy.fi Twitter Analytics — Week of May 12 – May 18, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi (Project Account) Weekly Performance Report</div>
+    <div class="date-range">May 12 &ndash; May 18, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">9</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;36% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,010</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;59% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">112</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;37% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">82</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;38% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">23.0%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+45% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">8</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+33% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>May 12&ndash;18 (this week)</td>
+            <td class="num">9</td>
+            <td class="num">1,010</td>
+            <td class="num">112</td>
+            <td class="num">82</td>
+            <td class="num">53</td>
+            <td class="num">17</td>
+            <td class="num">0</td>
+            <td class="num">8</td>
+            <td class="num">23.0%</td>
+          </tr>
+          <tr>
+            <td>May 5&ndash;11 (last week)</td>
+            <td class="num">14</td>
+            <td class="num">2,488</td>
+            <td class="num">178</td>
+            <td class="num">133</td>
+            <td class="num">79</td>
+            <td class="num">37</td>
+            <td class="num">2</td>
+            <td class="num">6</td>
+            <td class="num">15.9%</td>
+          </tr>
+          <tr>
+            <td>Apr 28&ndash;May 4 (2 wks ago)</td>
+            <td class="num">22</td>
+            <td class="num">15,508</td>
+            <td class="num">705</td>
+            <td class="num">159</td>
+            <td class="num">80</td>
+            <td class="num">28</td>
+            <td class="num">2</td>
+            <td class="num">21</td>
+            <td class="num">10.9%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 13</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>April inflation printed 3.8%. hotter than expected. highest since May 2023. gasoline up 28%. energy up 17.9%. rate cuts just got pushed further out. vault yields don&rsquo;t wait on rate policy to pay out yields.</div>
+      <div class="tweet-meta">
+        <span class="imp">138 impressions</span>
+        <span>9 likes</span>
+        <span>6 reposts</span>
+        <span>1 reply</span>
+        <span>5 clicks</span>
+        <span>ER: 24.64%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 14</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>same linked price. very different commitment. $2,200 ETH buy low: 7 days at 15% APY or 14 days at 24% APY. shorter duration: higher annualized rate, lower absolute dollar yield&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">134 impressions</span>
+        <span>12 likes</span>
+        <span>6 reposts</span>
+        <span>2 replies</span>
+        <span>0 clicks</span>
+        <span>ER: 17.16%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 16</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>the CLARITY Act just passed the Senate Banking Committee. BTC spiked to $82,000 on the news. then oil hit $100. leveraged longs got wiped. BTC gave back every dollar of those gains. a vault set before this week opened earned through the spike and the&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">134 impressions</span>
+        <span>11 likes</span>
+        <span>6 reposts</span>
+        <span>4 replies</span>
+        <span>3 clicks</span>
+        <span>ER: 26.87%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 15</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>Kevin Warsh is officially Fed Chair. he&rsquo;s the most crypto-friendly person to ever hold that job. he&rsquo;s also inheriting CPI at 3.8% &mdash; the hottest inflation print in two years. the Fed Chair most likely to be sympathetic to digital assets is also the most constrained from&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">115 impressions</span>
+        <span>10 likes</span>
+        <span>7 reposts</span>
+        <span>2 replies</span>
+        <span>0 clicks</span>
+        <span>ER: 24.35%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">May 13</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>when&rsquo;s the last time your capital worked while you were asleep.</div>
+      <div class="tweet-meta">
+        <span class="imp">111 impressions</span>
+        <span>8 likes</span>
+        <span>6 reposts</span>
+        <span>5 replies</span>
+        <span>0 clicks</span>
+        <span>ER: 23.42%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Avg engagement rate hit 23.0% &mdash; a new all-time weekly high, up 45% from last week&rsquo;s 15.9%.</strong> Every single tweet exceeded 17% ER. The content quality bar continues to rise, and the audience is deeply engaged with every post.</li>
+      <li><strong>News-jacking format dominated the top of the leaderboard.</strong> The CPI tweet (138 imp, 24.64% ER) and CLARITY Act tweet (134 imp, 26.87% ER) both tied breaking macro events to vault utility. Anchoring product messaging in real-world catalysts creates urgency and relevance.</li>
+      <li><strong>URL clicks improved to 8 (+33% WoW).</strong> The CPI tweet alone drove 5 clicks &mdash; the best single-tweet click performance in weeks. When the macro hook creates urgency, users actually click through to the product.</li>
+      <li><strong>The educational &ldquo;barrier notes&rdquo; and &ldquo;APY duration&rdquo; tweets both exceeded 100 impressions with strong engagement.</strong> TradFi-comparison formats continue to resonate. The &ldquo;same linked price, very different commitment&rdquo; framing earned 12 likes &mdash; the most of any tweet this week.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Volume dropped to just 9 tweets &mdash; the lowest output in weeks.</strong> Total impressions fell 59% WoW to 1,010. Fewer tweets means fewer chances to break through, and the declining reach trend (705 &rarr; 178 &rarr; 112 avg imp over 3 weeks) is accelerating.</li>
+      <li><strong>Zero bookmarks for the fourth consecutive week.</strong> Despite high-quality educational content (APY math, barrier notes comparison), nothing is being saved. The content performs in-feed but isn&rsquo;t formatted for reference or revisiting.</li>
+      <li><strong>Avg impressions continue their 3-week decline: 705 &rarr; 178 &rarr; 112.</strong> The account is talking to the same core audience without reaching new followers. No tweet broke 140 impressions &mdash; the ceiling keeps compressing.</li>
+      <li><strong>Saturday tweet (61 imp) was the worst performer of the week.</strong> The &ldquo;21h flight&rdquo; tweet lacked substance and underperformed. Weekend posting continues to drag down averages without a clear strategy.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Increase posting volume back to 12&ndash;14 tweets/week.</strong> The drop to 9 tweets contributed to the 59% impressions decline. More at-bats means more chances to break through to new audiences.</li>
+      <li><strong>Double down on macro news-jacking.</strong> The CPI and CLARITY Act tweets were the top performers. With Kevin Warsh as new Fed Chair and inflation at 3.8%, there will be no shortage of macro catalysts &mdash; tie every major headline back to vault utility.</li>
+      <li><strong>Create a &ldquo;save-worthy&rdquo; reference tweet to break the bookmarks drought.</strong> Try a numbered list (&ldquo;vault duration cheat sheet&rdquo;) or comparison chart designed to be saved and revisited. Four weeks of zero bookmarks signals a format gap.</li>
+      <li><strong>Try a thread format to extend reach beyond the core follower base.</strong> A numbered breakdown of how vaults performed during the CLARITY Act volatility could work well &mdash; threads get shown to non-followers more than single tweets.</li>
+      <li><strong>Add a clear CTA link to every 2nd or 3rd tweet.</strong> Only 3 of 9 tweets included links this week, yet those 3 drove all 8 URL clicks. The correlation is clear &mdash; no link means zero chance of a click-through.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>May 13</td>
+            <td>April inflation printed 3.8%. hotter than expected&hellip; vault yields don&rsquo;t wait on rate policy to pay out yields.</td>
+            <td class="num">138</td>
+            <td class="num">9</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">5</td>
+            <td class="num">24.64</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 14</td>
+            <td>same linked price. very different commitment. $2,200 ETH buy low&hellip;</td>
+            <td class="num">134</td>
+            <td class="num">12</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">17.16</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 16</td>
+            <td>the CLARITY Act just passed the Senate Banking Committee. BTC spiked to $82,000&hellip;</td>
+            <td class="num">134</td>
+            <td class="num">11</td>
+            <td class="num">6</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">26.87</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 15</td>
+            <td>Kevin Warsh is officially Fed Chair. he&rsquo;s the most crypto-friendly person to ever hold that job&hellip;</td>
+            <td class="num">115</td>
+            <td class="num">10</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">24.35</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>May 13</td>
+            <td>when&rsquo;s the last time your capital worked while you were asleep.</td>
+            <td class="num">111</td>
+            <td class="num">8</td>
+            <td class="num">6</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">23.42</td>
+          </tr>
+          <tr>
+            <td>May 14</td>
+            <td>barrier notes are sold by private banks to clients with $200,000+ minimums&hellip;</td>
+            <td class="num">108</td>
+            <td class="num">10</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">24.07</td>
+          </tr>
+          <tr>
+            <td>May 12</td>
+            <td>133% APY on a 2-day vault and 133% APY on a 30-day vault are not the same thing&hellip;</td>
+            <td class="num">106</td>
+            <td class="num">11</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">24.53</td>
+          </tr>
+          <tr>
+            <td>May 12</td>
+            <td>that moment you realize you haven&rsquo;t checked charts in 3 days and somehow you&rsquo;re still up</td>
+            <td class="num">103</td>
+            <td class="num">7</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">22.33</td>
+          </tr>
+          <tr>
+            <td>May 17</td>
+            <td>21h flight in two hours. vault doesn&rsquo;t need me here for it.</td>
+            <td class="num">61</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">19.67</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated May 20, 2026 &middot; Prodigy.fi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
