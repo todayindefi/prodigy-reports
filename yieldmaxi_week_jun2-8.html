@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Analytics — Week of Jun 2 – 8, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Yield Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jun 2 &ndash; 8, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">7</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;30% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2,014</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;46% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">288</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;23% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">29</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;44% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">11.0%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+116% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">10</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+150% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jun 2&ndash;8 (this week)</td>
+            <td class="num">7</td>
+            <td class="num">2,014</td>
+            <td class="num">288</td>
+            <td class="num">29</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">10</td>
+            <td class="num">11.0%</td>
+          </tr>
+          <tr>
+            <td>May 26&ndash;Jun 1 (last week)</td>
+            <td class="num">10</td>
+            <td class="num">3,756</td>
+            <td class="num">376</td>
+            <td class="num">52</td>
+            <td class="num">10</td>
+            <td class="num">3</td>
+            <td class="num">3</td>
+            <td class="num">4</td>
+            <td class="num">5.1%</td>
+          </tr>
+          <tr>
+            <td>May 19&ndash;25 (2 wks ago)</td>
+            <td class="num">9</td>
+            <td class="num">2,081</td>
+            <td class="num">231</td>
+            <td class="num">49</td>
+            <td class="num">13</td>
+            <td class="num">1</td>
+            <td class="num">3</td>
+            <td class="num">5</td>
+            <td class="num">7.6%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 3</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>While Bitcoin is breaking down, our Vault APYs are going bonkers. If you know what price you may want to buy at, you can earn 30-60% APY on our June 12 vaults.</div>
+      <div class="tweet-meta">
+        <span class="imp">1,593 impressions</span>
+        <span>4 likes</span>
+        <span>1 repost</span>
+        <span>1 bookmark</span>
+        <span>3 clicks</span>
+        <span>ER: 2.20%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 2</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Geopolitical risk is rising, and Bitcoin is taking a beating. But on prodigy.fi&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">163 impressions</span>
+        <span>8 likes</span>
+        <span>3 reposts</span>
+        <span>2 bookmarks</span>
+        <span>4 clicks</span>
+        <span>ER: 12.27%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 5</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>One of the major reasons BTC keeps going down &mdash; the same reflexive bid from Saylor that drove it up&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">71 impressions</span>
+        <span>1 like</span>
+        <span>ER: 4.23%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 3</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>Conversely, if you want to derisk &mdash; Our ETH Sell High vaults are earning ~22-50% APY for 3 days. <em>(thread reply)</em></div>
+      <div class="tweet-meta">
+        <span class="imp">61 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>ER: 14.75%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 4</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>Is it so over? &hellip; or are we so back? It doesn&rsquo;t matter what side you&rsquo;re on, our vaults are earning regardless.</div>
+      <div class="tweet-meta">
+        <span class="imp">57 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>3 clicks</span>
+        <span>ER: 21.05%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>URL clicks surged to 10 &mdash; up 150% from 4 last week.</strong> This is the best click week in over a month. The geopolitical risk tweet (4 clicks), BTC breaking down tweet (3 clicks), and &ldquo;so over/so back&rdquo; tweet (3 clicks) all converted.</li>
+      <li><strong>Avg engagement rate doubled to 11.0% from 5.1%.</strong> A significant improvement in quality over quantity &mdash; fewer tweets, but each one is earning more interaction from the audience that sees it.</li>
+      <li><strong>The &ldquo;so over or so back&rdquo; format hit 21.05% ER and 3 clicks on just 57 impressions.</strong> Proving that a concise, punchy tweet with a natural product tie-in can convert at extremely high rates. The 5.3% CTR on this tweet is exceptional.</li>
+      <li><strong>Click-through is improving across the board.</strong> The account is clearly getting better at driving action, not just reach. Three separate tweets drove clicks this week, compared to scattered single-click performance in prior weeks.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Volume dropped to just 7 tweets (down 30%).</strong> No posts on Saturday or Sunday, and only one on Monday. Algorithmic momentum suffers with gaps &mdash; three missing days is too many.</li>
+      <li><strong>Total impressions down 46% to 2,014.</strong> Largely driven by lower volume and no breakout tweet matching last week&rsquo;s 1,471. The 1,593 imp tweet carried most of the total, with the remaining 6 tweets averaging just 70 impressions.</li>
+      <li><strong>The 1,593 imp breakout tweet had very low engagement (4 likes, 2.20% ER).</strong> High reach but the audience didn&rsquo;t engage proportionally. The copy was product-forward, which may explain the low ER despite strong algorithmic distribution.</li>
+      <li><strong>Zero replies across all 7 tweets.</strong> No questions, no provocative takes, nothing designed to elicit conversation. This is the second week in a row with near-zero replies &mdash; a missed engagement signal for the algorithm.</li>
+      <li><strong>Likes dropped 44% to 29.</strong> Engagement is concentrating in clicks at the expense of social signals like likes and reposts. While clicks matter more for conversion, low likes reduce algorithmic distribution.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Post every day.</strong> Three gap days (Sat, Sun, Mon with only 1 post) kills momentum. Even a one-line market take keeps the feed alive and costs almost nothing in effort.</li>
+      <li><strong>Replicate the &ldquo;so over/so back&rdquo; format.</strong> 21% ER and 5.3% CTR on a short tweet is exceptional. This concise, choice-format with a natural product tie-in is the most efficient format tested so far.</li>
+      <li><strong>Add at least one question per week to drive replies.</strong> Zero replies for 2 consecutive weeks is a missed engagement signal. Try: &ldquo;What&rsquo;s your ETH target right now?&rdquo; or &ldquo;At what price would you start buying again?&rdquo;</li>
+      <li><strong>Keep the market-volatility-to-vault-APY connection.</strong> The &ldquo;APYs going bonkers&rdquo; framing during downturns is working for reach AND clicks. This is the account&rsquo;s strongest content-market fit.</li>
+      <li><strong>Balance reach tweets with engagement tweets.</strong> The 1,593 imp tweet proves the account can get algorithmic distribution, but 2.20% ER means it&rsquo;s not converting to community. Mix in personal takes and conviction statements that earned 4 reposts last week.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Jun 3</td>
+            <td>While Bitcoin is breaking down, our Vault APYs are going bonkers&hellip;</td>
+            <td class="num">1,593</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">3</td>
+            <td class="num">2.20</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 2</td>
+            <td>Geopolitical risk is rising, and Bitcoin is taking a beating&hellip;</td>
+            <td class="num">163</td>
+            <td class="num">8</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">4</td>
+            <td class="num">12.27</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 5</td>
+            <td>One of the major reasons BTC keeps going down &mdash; the same reflexive bid from Saylor&hellip;</td>
+            <td class="num">71</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">4.23</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 3</td>
+            <td>Conversely, if you want to derisk &mdash; Our ETH Sell High vaults&hellip; <em>(thread reply)</em></td>
+            <td class="num">61</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">14.75</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 4</td>
+            <td>Is it so over? &hellip; or are we so back? It doesn&rsquo;t matter what side you&rsquo;re on&hellip;</td>
+            <td class="num">57</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">21.05</td>
+          </tr>
+          <tr>
+            <td>Jun 5</td>
+            <td>Volatility driving vault APYs high&hellip;</td>
+            <td class="num">38</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">15.79</td>
+          </tr>
+          <tr>
+            <td>Jun 5</td>
+            <td>Bull case for ETH + buy low price link&hellip;</td>
+            <td class="num">31</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.45</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Jun 8, 2026 &middot; Yield Maxi Marketing Analytics &middot; Followers: 609
+  </div>
+
+</div>
+</body>
+</html>
