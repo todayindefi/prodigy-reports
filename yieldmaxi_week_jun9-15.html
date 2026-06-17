@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Analytics — Week of Jun 9 – 15, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Yield Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jun 9 &ndash; 15, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">6</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;25% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2,136</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+1% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">356</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta up">+34% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">47</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+42% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">12.0%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+15% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">5</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;50% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jun 9&ndash;15 (this week)</td>
+            <td class="num">6</td>
+            <td class="num">2,136</td>
+            <td class="num">356</td>
+            <td class="num">47</td>
+            <td class="num">9</td>
+            <td class="num">17</td>
+            <td class="num">3</td>
+            <td class="num">5</td>
+            <td class="num">12.0%</td>
+          </tr>
+          <tr>
+            <td>Jun 2&ndash;8 (last week)</td>
+            <td class="num">8</td>
+            <td class="num">2,116</td>
+            <td class="num">265</td>
+            <td class="num">33</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">10</td>
+            <td class="num">10.4%</td>
+          </tr>
+          <tr>
+            <td>May 26&ndash;Jun 1 (2 wks ago)</td>
+            <td class="num">10</td>
+            <td class="num">3,782</td>
+            <td class="num">378</td>
+            <td class="num">52</td>
+            <td class="num">10</td>
+            <td class="num">3</td>
+            <td class="num">3</td>
+            <td class="num">4</td>
+            <td class="num">5.1%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 6 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 12</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>One day, the US is bombing Iran, the next day, the bombing is cancelled. If you want an alternative to directional bets&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">990 impressions</span>
+        <span>19 likes</span>
+        <span>3 reposts</span>
+        <span>13 replies</span>
+        <span>1 bookmark</span>
+        <span>3 clicks</span>
+        <span>ER: 6.46%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 11</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>APYX offered 11%+ APY on a &lsquo;dollar&rsquo; but after its backing STRC fell to 95, its been trading below a dollar&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">516 impressions</span>
+        <span>6 likes</span>
+        <span>2 reposts</span>
+        <span>ER: 7.17%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 10</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>The US struck Iran &mdash; but this time markets barely reacted. War fatigue is setting in&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">227 impressions</span>
+        <span>3 likes</span>
+        <span>1 repost</span>
+        <span>1 bookmark</span>
+        <span>ER: 7.05%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 11</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>If you want simple, transparent yield, prodigy.fi provides options-sourced yield&hellip; <em>(thread reply to APYX tweet)</em></div>
+      <div class="tweet-meta">
+        <span class="imp">189 impressions</span>
+        <span>8 likes</span>
+        <span>4 replies</span>
+        <span>1 click</span>
+        <span>ER: 8.99%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 9</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>The options market is leaning bullish: Our Sell high vaults earn you more than Buy low. Do you agree?</div>
+      <div class="tweet-meta">
+        <span class="imp">138 impressions</span>
+        <span>8 likes</span>
+        <span>1 repost</span>
+        <span>1 bookmark</span>
+        <span>1 click</span>
+        <span>ER: 21.01%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 15</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>Trump announced a peace deal&hellip; again. But this time &mdash; Iran side is confirming &mdash; it may actually happen&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">76 impressions</span>
+        <span>3 likes</span>
+        <span>2 reposts</span>
+        <span>ER: 21.05%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Replies exploded from 0 to 17 &mdash; ending a two-week drought.</strong> The Iran/bombing tweet drove 13 replies alone (990 imp, 6.46% ER). Geopolitical content with a clear product tie-in is sparking conversation.</li>
+      <li><strong>Followers grew from 609 to 620 &mdash; the best weekly gain in the entire tracking period.</strong> +11 followers (~1.8% growth). The combination of provocative geopolitical takes and risk-breakdown content is attracting new followers.</li>
+      <li><strong>Likes surged 42% to 47 from 33.</strong> The Iran tweet (19 likes) was the most-liked tweet in weeks.</li>
+      <li><strong>Avg impressions up 34% to 356 and ER up 15% to 12.0%.</strong> Quality metrics improving across the board despite fewer tweets.</li>
+      <li><strong>The APYX risk-breakdown tweet (516 imp) continues to validate the format</strong> of naming specific failing products then contrasting with Prodigy&rsquo;s transparency. This is the third time a risk-breakdown tweet has hit 500+ imp.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>URL clicks dropped 50% to 5 from 10.</strong> Last week&rsquo;s click surge wasn&rsquo;t sustained. The Iran tweet (990 imp, 13 replies) only earned 3 clicks despite massive engagement.</li>
+      <li><strong>Volume still low at 6 tweets &mdash; no posts on Friday or Saturday</strong> (only 1 on Sunday). Three gap days per week continues to hurt momentum.</li>
+      <li><strong>Bookmarks flat at 3 for the fourth consecutive week.</strong> The content drives reach and replies but people aren&rsquo;t saving it for reference. Needs more educational/reference-worthy content mixed in.</li>
+      <li><strong>Zero replies on 4 of 6 tweets.</strong> The reply activity was concentrated in one tweet (Iran, 13 replies). The engagement question format (&ldquo;Do you agree?&rdquo;) on the options market tweet got 0 replies despite 138 imp.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Post every day, even weekends.</strong> Three gap days is consistently hurting this account. A one-line market take costs nothing and keeps algorithmic momentum.</li>
+      <li><strong>Keep the geopolitical-hook-to-vault-tie-in format.</strong> The Iran tweet (990 imp, 19 likes, 13 replies, 3 clicks) is the best all-around tweet in weeks. Current events &rarr; uncertainty &rarr; vault as the hedge.</li>
+      <li><strong>Mix in more educational/reference content to drive bookmarks.</strong> The APYX breakdown (516 imp) got 0 bookmarks because it was more news commentary than evergreen reference. Try adding a &ldquo;how to evaluate yield risk&rdquo; checklist format.</li>
+      <li><strong>End more tweets with explicit questions.</strong> &ldquo;Do you agree?&rdquo; didn&rsquo;t spark replies, but the Iran tweet&rsquo;s implicit provocation did. Try more pointed questions: &ldquo;Would you take 30% APY if you knew exactly what the risk was?&rdquo;</li>
+      <li><strong>The thread-reply CTA on the APYX tweet earned 4 replies and 1 click.</strong> The copy &ldquo;simple, transparent yield&rdquo; connected to the thread topic (opaque/risky yield). Keep doing topic-specific CTAs in thread replies.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Jun 12</td>
+            <td>One day, the US is bombing Iran, the next day, the bombing is cancelled&hellip;</td>
+            <td class="num">990</td>
+            <td class="num">19</td>
+            <td class="num">3</td>
+            <td class="num">13</td>
+            <td class="num">1</td>
+            <td class="num">3</td>
+            <td class="num">6.46</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 11</td>
+            <td>APYX offered 11%+ APY on a &lsquo;dollar&rsquo; but after its backing STRC fell to 95&hellip;</td>
+            <td class="num">516</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.17</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 10</td>
+            <td>The US struck Iran &mdash; but this time markets barely reacted&hellip;</td>
+            <td class="num">227</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">7.05</td>
+          </tr>
+          <tr>
+            <td>Jun 11</td>
+            <td>If you want simple, transparent yield, prodigy.fi provides&hellip; <em>(thread reply)</em></td>
+            <td class="num">189</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">8.99</td>
+          </tr>
+          <tr>
+            <td>Jun 9</td>
+            <td>The options market is leaning bullish: Our Sell high vaults earn you more&hellip;</td>
+            <td class="num">138</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">1</td>
+            <td class="num">21.01</td>
+          </tr>
+          <tr>
+            <td>Jun 15</td>
+            <td>Trump announced a peace deal&hellip; again. But this time &mdash; Iran side is confirming&hellip;</td>
+            <td class="num">76</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">21.05</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Jun 17, 2026 &middot; Yield Maxi Marketing Analytics &middot; Followers: 620
+  </div>
+
+</div>
+</body>
+</html>
