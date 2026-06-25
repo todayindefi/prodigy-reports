@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Analytics — Week of Jun 16 – 22, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Yield Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jun 16 &ndash; 22, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">8</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+33% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,481</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;36% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">185</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;52% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">31</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;38% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">7.0%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">&minus;34% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;60% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jun 16&ndash;22 (this week)</td>
+            <td class="num">8</td>
+            <td class="num">1,481</td>
+            <td class="num">185</td>
+            <td class="num">31</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">7.0%</td>
+          </tr>
+          <tr>
+            <td>Jun 9&ndash;15 (last week)</td>
+            <td class="num">6</td>
+            <td class="num">2,314</td>
+            <td class="num">386</td>
+            <td class="num">50</td>
+            <td class="num">9</td>
+            <td class="num">17</td>
+            <td class="num">3</td>
+            <td class="num">5</td>
+            <td class="num">10.6%</td>
+          </tr>
+          <tr>
+            <td>Jun 2&ndash;8 (2 wks ago)</td>
+            <td class="num">8</td>
+            <td class="num">2,125</td>
+            <td class="num">266</td>
+            <td class="num">33</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">10</td>
+            <td class="num">10.3%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 8 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 16</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Trading Catalysts this week: Today/Friday US-Iran deal Already signed digitally, formal signing ceremony&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">433 impressions</span>
+        <span>5 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 2.54%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 22</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>The more complex the strategy, the harder to judge the risk. prodigy.fi offers simple, transparent&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">421 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>2 clicks</span>
+        <span>ER: 3.33%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 17</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>STRC is dropping like a depegged stablecoin &mdash; will BTC follow? A lot of chatter on CT today&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">225 impressions</span>
+        <span>7 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 8.00%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 18</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>&lsquo;You can&rsquo;t get yield on Bitcoin&rsquo; What if you could? prodigy.fi cbBTC vaults offer&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">139 impressions</span>
+        <span>6 likes</span>
+        <span>2 reposts</span>
+        <span>1 reply</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 14.39%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 16</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>If you think Warsh will be dovish, or the Deal will turn out well, our Buy Low vaults expiring&hellip; <em>(thread reply to catalysts tweet)</em></div>
+      <div class="tweet-meta">
+        <span class="imp">91 impressions</span>
+        <span>4 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.59%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 17</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>STRC stress doesn&rsquo;t put direct sell pressure on Bitcoin, but it does take away a source of&hellip; <em>(thread reply to STRC tweet)</em></div>
+      <div class="tweet-meta">
+        <span class="imp">87 impressions</span>
+        <span>3 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.90%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 22</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>The choice is yours: Opaque, complex strategies that turn out to be rugs. Or simple options-based&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">50 impressions</span>
+        <span>0 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.00%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 17</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>Today is the Decision. Which way do you lean? Place your bets at prodigy.fi</div>
+      <div class="tweet-meta">
+        <span class="imp">35 impressions</span>
+        <span>1 like</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 8.57%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Volume improved to 8 tweets (up from 6) &mdash; still not daily posting but more consistent.</strong> Increased output by 33% week-over-week, showing progress on the recurring volume recommendation.</li>
+      <li><strong>The trading catalysts tweet (433 imp) shows that structured market preview content with specific dates and events drives reach.</strong> This is a new format that worked &mdash; giving readers a reason to come back and follow the account for ongoing coverage.</li>
+      <li><strong>The &ldquo;You can&rsquo;t get yield on Bitcoin&rdquo; tweet (139 imp, 14.39% ER) introduced cbBTC vaults with a provocative hook.</strong> This myth-busting format drove the highest engagement rate of the week. Challenging conventional wisdom is a strong content pattern.</li>
+      <li><strong>The STRC thread (225 + 87 imp) shows this account can do risk-breakdown content about specific projects while staying relevant to Prodigy&rsquo;s value prop.</strong> The thread structure worked well, with the parent tweet earning strong engagement (8.00% ER) and the reply adding depth.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Total impressions dropped 36% to 1,481 &mdash; no breakout tweet this week.</strong> Last week&rsquo;s Iran tweet (990 imp) and APYX tweet (516 imp) set a high bar that wasn&rsquo;t matched. The top tweet this week was only 433 imp.</li>
+      <li><strong>Replies collapsed from 17 to just 1 &mdash; back to near-zero conversation.</strong> Last week&rsquo;s reply explosion was concentrated in one tweet and wasn&rsquo;t sustained. Engagement is passive (likes) rather than active (replies).</li>
+      <li><strong>Likes dropped 38% to 31 &mdash; engagement across the board declined.</strong> Even with more tweets posted, total engagement was lower than last week on fewer tweets.</li>
+      <li><strong>Only 2 URL clicks &mdash; click conversion remains inconsistent.</strong> The &ldquo;complex strategy&rdquo; tweet (421 imp, 2 clicks) was the only tweet to earn clicks. Six of eight tweets got zero clicks.</li>
+      <li><strong>No posts Wednesday through Friday &mdash; 3 gap days again.</strong> This is a recurring problem every single week. The mid-week silence kills algorithmic momentum.</li>
+      <li><strong>Follower count dipped from 620 to 617 &mdash; the gains from last week were given back.</strong> Net negative growth suggests the content isn&rsquo;t retaining new followers attracted by last week&rsquo;s viral tweets.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Post every single day &mdash; 3 gap days (Wed&ndash;Fri) is killing momentum.</strong> Even a one-sentence market take keeps the algorithm engaged. This has been the recommendation for 4 straight weeks and remains unaddressed.</li>
+      <li><strong>Do more &ldquo;trading catalysts this week&rdquo; preview content.</strong> The 433 imp tweet worked because it gave readers a reason to come back and follow the account. A Monday preview + Friday recap format would build habit.</li>
+      <li><strong>Keep the myth-busting format.</strong> &ldquo;You can&rsquo;t get yield on Bitcoin&rdquo; (14.39% ER) hooks people with a challenge to conventional wisdom. Try: &ldquo;You can&rsquo;t hedge without selling&rdquo;, &ldquo;You can&rsquo;t earn yield without staking&rdquo;.</li>
+      <li><strong>Add questions to drive replies &mdash; last week proved the audience WILL reply (17 replies) when provoked.</strong> The &ldquo;Which way do you lean? Place your bets&rdquo; tweet (35 imp) was too low-energy. Try more pointed questions with stakes.</li>
+      <li><strong>Post a thread-reply CTA after every tweet that breaks 200+ impressions.</strong> The catalysts tweet (433 imp) and the &ldquo;complex strategy&rdquo; tweet (421 imp) both had no immediate CTA follow-up. Those were missed conversion opportunities.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Jun 16</td>
+            <td>Trading Catalysts this week: Today/Friday US-Iran deal&hellip;</td>
+            <td class="num">433</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2.54</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 22</td>
+            <td>The more complex the strategy, the harder to judge the risk&hellip;</td>
+            <td class="num">421</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">2</td>
+            <td class="num">3.33</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jun 17</td>
+            <td>STRC is dropping like a depegged stablecoin &mdash; will BTC follow?&hellip;</td>
+            <td class="num">225</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">8.00</td>
+          </tr>
+          <tr>
+            <td>Jun 18</td>
+            <td>&lsquo;You can&rsquo;t get yield on Bitcoin&rsquo; What if you could?&hellip;</td>
+            <td class="num">139</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">14.39</td>
+          </tr>
+          <tr>
+            <td>Jun 16</td>
+            <td>If you think Warsh will be dovish, or the Deal will turn out well&hellip; <em>(thread reply)</em></td>
+            <td class="num">91</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.59</td>
+          </tr>
+          <tr>
+            <td>Jun 17</td>
+            <td>STRC stress doesn&rsquo;t put direct sell pressure on Bitcoin&hellip; <em>(thread reply)</em></td>
+            <td class="num">87</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.90</td>
+          </tr>
+          <tr>
+            <td>Jun 22</td>
+            <td>The choice is yours: Opaque, complex strategies that turn out to be rugs&hellip;</td>
+            <td class="num">50</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.00</td>
+          </tr>
+          <tr>
+            <td>Jun 17</td>
+            <td>Today is the Decision. Which way do you lean? Place your bets&hellip;</td>
+            <td class="num">35</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.57</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Jun 25, 2026 &middot; Yield Maxi Marketing Analytics &middot; Followers: 617
+  </div>
+
+</div>
+</body>
+</html>
