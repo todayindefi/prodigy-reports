@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yield Maxi Twitter Analytics — Week of Jun 30 – Jul 6, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Yield Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jun 30 &ndash; Jul 6, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">5</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;29% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,982</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+28% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">396</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta up">+79% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">32</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;6% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">8.3%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+43% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;67% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jun 30&ndash;Jul 6 (this week)</td>
+            <td class="num">5</td>
+            <td class="num">1,982</td>
+            <td class="num">396</td>
+            <td class="num">32</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">8.3%</td>
+          </tr>
+          <tr>
+            <td>Jun 23&ndash;29 (last week)</td>
+            <td class="num">7</td>
+            <td class="num">1,547</td>
+            <td class="num">221</td>
+            <td class="num">34</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">5.8%</td>
+          </tr>
+          <tr>
+            <td>Jun 16&ndash;22 (2 wks ago)</td>
+            <td class="num">8</td>
+            <td class="num">1,548</td>
+            <td class="num">194</td>
+            <td class="num">31</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">6.6%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 5 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jun 30</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Strategy just quietly removed one of the biggest fears hanging over $BTC: the &ldquo;forced seller&rdquo; overhang. Here&rsquo;s what actually happened &rarr; On June 29, Strategy announced a Digital Credit Capital Framework. The bear case it targets: Strategy holds 847,363 BTC (~4% of all&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">1,070 impressions</span>
+        <span>7 likes</span>
+        <span>3 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 2.15%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 3</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Is BTC&rsquo;s bottom in? One way to check: BTC vs Nasdaq The idea: Equities have been stealing the spotlight &mdash; and the capital. Therefore for Crypto to do well, it needs to show it can outperform traditional markets. This week, For the first time in a while, BTC is starting to&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">716 impressions</span>
+        <span>9 likes</span>
+        <span>2 reposts</span>
+        <span>1 reply</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 5.17%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 1</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>If you&rsquo;re farming on chain, you should never be fully in one strategy Looping is high apr, but can turn negative. Lending is liquid, but low APR Diversifying with options strategies like prodigy.fi can improve risk adjusted yield of your entire portfolio.</div>
+      <div class="tweet-meta">
+        <span class="imp">77 impressions</span>
+        <span>6 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>1 click</span>
+        <span>ER: 10.39%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 2</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>The best way to understand Prodigy is in between farming and trading and when the market is moving, like it is today, is the best time to participate Set a price you&rsquo;d buy at(or sell at): You either earn great yield &mdash;or get your crypto at a great price.</div>
+      <div class="tweet-meta">
+        <span class="imp">77 impressions</span>
+        <span>6 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 11.69%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 2</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>You could miss the bottom like credibull and cope Or you could place orders with our buy low vaults at prodigy.fi get filled or earn great yield Win either way.</div>
+      <div class="tweet-meta">
+        <span class="imp">42 impressions</span>
+        <span>4 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 11.9%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Strategy/MSTR tweet crushed at 1,070 impressions</strong> &mdash; more than the entire previous week&rsquo;s total. Macro analysis with a strong narrative hook (&ldquo;forced seller overhang removed&rdquo;) is the account&rsquo;s best-performing format.</li>
+      <li><strong>Total impressions surged 28% to 1,982</strong> &mdash; reversing a 3-week decline (1,548 &rarr; 1,547 &rarr; 1,982). Average impressions up 79% to 396 &mdash; the highest in months.</li>
+      <li><strong>BTC vs Nasdaq tweet (716 imp, 5.17% ER)</strong> &mdash; original analysis with a chart performed well. Data-driven market takes are this account&rsquo;s bread and butter.</li>
+      <li><strong>Engagement rate jumped to 8.3% from 5.8%</strong> &mdash; the audience is resonating more deeply with the content, especially the two macro analysis tweets.</li>
+      <li><strong>Both Prodigy product tweets earned bookmarks</strong> &mdash; the farming diversification tweet (77 imp, 1 bookmark, 1 click) and the &ldquo;buy at your price&rdquo; explainer (77 imp, 1 bookmark) show that practical Prodigy explanations earn saves.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Only 5 tweets posted &mdash; the lowest volume in recent weeks.</strong> Despite higher avg impressions, total reach is capped by low output. The top 2 macro tweets did all the heavy lifting.</li>
+      <li><strong>URL clicks dropped to 1 from 3 last week (&minus;67%).</strong> The two best-performing tweets had zero clicks &mdash; they&rsquo;re macro analysis without a clear Prodigy CTA. Great for reach, weak for conversion.</li>
+      <li><strong>The credibull/cope tweet (42 imp) underperformed</strong> &mdash; the dunking/comparison format didn&rsquo;t land this time. Too niche a reference (credibull) for the broader audience.</li>
+      <li><strong>Replies stayed flat at 1 total</strong> &mdash; same as last week. The content is informational but not generating discussion. No questions, no polls, no controversy.</li>
+      <li><strong>Follower count dipped slightly (615 &rarr; 613, &minus;2).</strong> Not alarming but worth noting &mdash; the high-impression macro tweets aren&rsquo;t converting to follows.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Scale up posting volume to 8&ndash;10 tweets while maintaining the quality bar set by the Strategy and BTC/Nasdaq tweets.</strong> The data is clear: macro analysis + narrative hook = reach. Do more of it.</li>
+      <li><strong>Add a Prodigy tie-in to the macro tweets.</strong> The top 2 tweets earned 1,786 impressions and 0 URL clicks. Even a brief &ldquo;here&rsquo;s how to position for this with structured yield&rdquo; line could convert some of that attention.</li>
+      <li><strong>Post at least one engagement-driving tweet</strong> &mdash; a question, a poll, or a hot take that invites replies. Replies have been at 0&ndash;1 for 3 weeks straight.</li>
+      <li><strong>Try the &ldquo;news-jacking + Prodigy contrast&rdquo; format again</strong> &mdash; it was the top performer last week (GoldFinch rug tweet, 425 imp). The Vitalik Lean Ethereum strawmap is a timely opportunity.</li>
+      <li><strong>Focus CTA tweets on connecting to the parent content</strong> &mdash; the credibull tweet was too disconnected. CTAs should feel like a natural next step from the preceding analysis.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Jun 30</td>
+            <td>Strategy just quietly removed one of the biggest fears hanging over $BTC&hellip;</td>
+            <td class="num">1,070</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">2.15</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 3</td>
+            <td>Is BTC&rsquo;s bottom in? One way to check: BTC vs Nasdaq&hellip;</td>
+            <td class="num">716</td>
+            <td class="num">9</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">5.17</td>
+          </tr>
+          <tr>
+            <td>Jul 1</td>
+            <td>If you&rsquo;re farming on chain, you should never be fully in one strategy&hellip;</td>
+            <td class="num">77</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">1</td>
+            <td class="num">10.39</td>
+          </tr>
+          <tr>
+            <td>Jul 2</td>
+            <td>The best way to understand Prodigy is in between farming and trading&hellip;</td>
+            <td class="num">77</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">11.69</td>
+          </tr>
+          <tr>
+            <td>Jul 2</td>
+            <td>You could miss the bottom like credibull and cope&hellip;</td>
+            <td class="num">42</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">11.90</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Jul 8, 2026 &middot; Yield Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
