@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xYield_Maxi Twitter Analytics — Week of Jul 7 – Jul 13, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>0xYield_Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jul 7 &ndash; Jul 13, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">6</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;14% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,976</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;23% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">329</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;11% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">37</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;20% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">9.1%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+25% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">3</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta flat">0% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jul 7&ndash;13 (this week)</td>
+            <td class="num">6</td>
+            <td class="num">1,976</td>
+            <td class="num">329</td>
+            <td class="num">37</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">9.1%</td>
+          </tr>
+          <tr>
+            <td>Jun 30&ndash;Jul 6 (last week)</td>
+            <td class="num">7</td>
+            <td class="num">2,574</td>
+            <td class="num">368</td>
+            <td class="num">46</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">7.3%</td>
+          </tr>
+          <tr>
+            <td>Jun 23&ndash;29 (2 wks ago)</td>
+            <td class="num">7</td>
+            <td class="num">1,579</td>
+            <td class="num">226</td>
+            <td class="num">34</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">5.7%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 6 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 6</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Vitalik just dropped the most ambitious Ethereum roadmap since the Merge. 7 hard forks through 2029: -Quantum resistance -STARKs everywhere -Native privacy. A full &lsquo;Ship of Theseus&rsquo; rebuild&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">798 impressions</span>
+        <span>4 likes</span>
+        <span>3 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 4.14%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 8</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Everyone&rsquo;s offering stablecoin yield these days, but what about BTC and ETH Yield? 3-4% --if you&rsquo;re lucky. Meanwhile Prodigy offers 10%+ on BTC on our 3 day vaults&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">765 impressions</span>
+        <span>10 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 2.88%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 10</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>Good risk adjusted yields this week, from 7-9%. (If you want even higher yields, prodigy.fi has 39% on ETH buy low vaults)</div>
+      <div class="tweet-meta">
+        <span class="imp">145 impressions</span>
+        <span>6 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.59%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 7</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>Choppy markets are hell for traders But for prodigy.fi users they&rsquo;re great Options traders pay more&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">111 impressions</span>
+        <span>6 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>2 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 9.01%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 9</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>Another week, another ceasefire broken Markets whipsawing - Perp traders rekt But if you were in our prodigy.fi vaults&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">81 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 12.35%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 7</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>Since last week, Bitcoin has continued to do well against stocks, often an early sign&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">76 impressions</span>
+        <span>6 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 18.42%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>The Vitalik roadmap tweet crushed it at 798 impressions</strong> &mdash; the highest single-tweet performance for this account in recent weeks. News-driven macro content gets outsized reach on the founder account.</li>
+      <li><strong>BTC/ETH yield comparison tweet (765 imp, 10 likes) was the second highest</strong> &mdash; framing ProdigyFi as the answer to a real problem (&ldquo;everyone offers stablecoin yield, but BTC/ETH?&rdquo;) is compelling positioning.</li>
+      <li><strong>Engagement rate jumped to 9.1% (up 25% from 7.3%)</strong> &mdash; the audience is more actively engaging even though reach declined. Quality of interaction is improving.</li>
+      <li><strong>URL clicks held steady at 3</strong> &mdash; the ceasefire tweet drove 2 clicks, showing that urgency + specific APY numbers converts.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Total impressions dropped 23% to 1,976</strong> &mdash; the two mega tweets (798 + 765 = 1,563) carried the week. The remaining 4 tweets averaged only 103 impressions.</li>
+      <li><strong>Zero replies all week</strong> &mdash; the founder account isn&rsquo;t generating conversation. None of the 6 tweets prompted a single reply.</li>
+      <li><strong>Bookmarks dropped to 4 (from 5) and are concentrated in just 2 tweets.</strong> Most content isn&rsquo;t being saved for later.</li>
+      <li><strong>Only 6 tweets posted (down from 7)</strong> &mdash; volume is already low; any decrease in cadence hurts total reach.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Maintain the macro-news + product-positioning formula</strong> &mdash; the Vitalik and BTC yield tweets prove this works. When big news drops, lead with commentary, close with ProdigyFi positioning.</li>
+      <li><strong>Add a question or opinion prompt to drive replies</strong> &mdash; &ldquo;What&rsquo;s your take?&rdquo; or &ldquo;Would you do this?&rdquo; at the end of a tweet. Zero replies signals the content feels like a broadcast, not a conversation.</li>
+      <li><strong>Increase posting cadence to 8&ndash;10 tweets/week</strong> &mdash; 6 is too few. Even short observations or market commentary would help maintain presence.</li>
+      <li><strong>The choppy-markets tweet (111 imp, 9.01% ER, 2 bookmarks) shows that short punchy takes outperform longer educational posts on engagement rate.</strong> Mix in more concise hot-take format.</li>
+      <li><strong>Consider posting the BTC/ETH yield comparison as a thread with screenshots of actual vault APYs</strong> &mdash; the 765 imp shows the concept resonates, but 0 URL clicks means the audience didn&rsquo;t act on it.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Jul 6</td>
+            <td>Vitalik just dropped the most ambitious Ethereum roadmap since the Merge&hellip;</td>
+            <td class="num">798</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">4.14</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 8</td>
+            <td>Everyone&rsquo;s offering stablecoin yield these days, but what about BTC and ETH Yield?&hellip;</td>
+            <td class="num">765</td>
+            <td class="num">10</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">2.88</td>
+          </tr>
+          <tr>
+            <td>Jul 10</td>
+            <td>Good risk adjusted yields this week, from 7-9%&hellip;</td>
+            <td class="num">145</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.59</td>
+          </tr>
+          <tr>
+            <td>Jul 7</td>
+            <td>Choppy markets are hell for traders But for prodigy.fi users they&rsquo;re great&hellip;</td>
+            <td class="num">111</td>
+            <td class="num">6</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">9.01</td>
+          </tr>
+          <tr>
+            <td>Jul 9</td>
+            <td>Another week, another ceasefire broken Markets whipsawing&hellip;</td>
+            <td class="num">81</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">12.35</td>
+          </tr>
+          <tr>
+            <td>Jul 7</td>
+            <td>Since last week, Bitcoin has continued to do well against stocks&hellip;</td>
+            <td class="num">76</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">18.42</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Jul 21, 2026 &middot; 0xYield_Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
