@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xYield_Maxi Twitter Analytics — Week of Jul 13 – 19, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>0xYield_Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jul 13 &ndash; 19, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">10</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+67% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,045</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;47% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">105</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;68% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">46</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+24% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">11.7%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+29% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;33% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jul 13&ndash;19 (this week)</td>
+            <td class="num">10</td>
+            <td class="num">1,045</td>
+            <td class="num">105</td>
+            <td class="num">46</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">11.7%</td>
+          </tr>
+          <tr>
+            <td>Jul 7&ndash;13 (last week)</td>
+            <td class="num">6</td>
+            <td class="num">1,976</td>
+            <td class="num">329</td>
+            <td class="num">37</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">9.1%</td>
+          </tr>
+          <tr>
+            <td>Jun 30&ndash;Jul 6 (2 wks ago)</td>
+            <td class="num">7</td>
+            <td class="num">2,574</td>
+            <td class="num">368</td>
+            <td class="num">46</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">5</td>
+            <td class="num">3</td>
+            <td class="num">7.3%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 10 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 13</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>We&rsquo;re at an interesting week for the markets right now. VIX - expected volatility for markets, is quite low right now But on Tuesday, we have CPI. With a new Fed chair - Each data point has more impact. My expectation: Expect some &lsquo;chop&rsquo; today and tomorrow.</div>
+      <div class="tweet-meta">
+        <span class="imp">407 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 2.21%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 14</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Just when you thought we were out of the war -- We&rsquo;re back in. It&rsquo;s a terrible market to trade. But its a perfect market for options vaults like prodigy.fi - earn from the chop.</div>
+      <div class="tweet-meta">
+        <span class="imp">104 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.69%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 17</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>How do prodigy.fi Sell High vaults offer 11%+? Option premiums You agree to sell your bitcoin at a certain price, someone else pays for that option, and you earn their payment Right now that&rsquo;s 24%apy on our 7d vaults</div>
+      <div class="tweet-meta">
+        <span class="imp">102 impressions</span>
+        <span>9 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>2 clicks</span>
+        <span>ER: 14.71%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 17</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>One of the best traders to follow for general market direction DonAlt has been through multiple market cycles and is semi-retired:</div>
+      <div class="tweet-meta">
+        <span class="imp">91 impressions</span>
+        <span>3 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 3.3%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 15</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>CPI came in today: Cool - cooling rate hike expectations Markets reacted fast- ETH seems like it may be breaking out. Want to lev long?, there&rsquo;s a lot of options like DeFiSaver If you&rsquo;re already long and want to earn yield on ETH(Or USD) - check out prodigy.fi</div>
+      <div class="tweet-meta">
+        <span class="imp">75 impressions</span>
+        <span>4 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 8.0%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 14</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>Bitcoin is crypto&rsquo;s most pristine asset - and the hardest to get yield on. Through options premiums, prodigy.fi can offer high yield on Bitcoin&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">71 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 14.08%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 16</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>Did you know we support Base? You can onboard to all our vaults easily from Coinbase, including cbBTC - only on Base. (And yes those APYs are real)</div>
+      <div class="tweet-meta">
+        <span class="imp">62 impressions</span>
+        <span>8 likes</span>
+        <span>3 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 17.74%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 16</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>Lot of stories like this Trading is hard - most traders lose. Farming is better: Earn yield on your long term assets instead of taking short term directional views.</div>
+      <div class="tweet-meta">
+        <span class="imp">58 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 18.97%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 17</div>
+      <div class="tweet-text"><span class="tweet-rank">9</span>@grugcapital can be in this life, in eastern europe</div>
+      <div class="tweet-meta">
+        <span class="imp">58 impressions</span>
+        <span>1 like</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 6.9%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 17</div>
+      <div class="tweet-text"><span class="tweet-rank">10</span>@0xDeantoshi @Yieldzio thanks for building yieldz! Great resource</div>
+      <div class="tweet-meta">
+        <span class="imp">17 impressions</span>
+        <span>1 like</span>
+        <span>0 reposts</span>
+        <span>1 reply</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 23.53%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Tweet volume increased 67% to 10 tweets (from 6)</strong> &mdash; better cadence and consistency this week.</li>
+      <li><strong>Engagement rate soared to 11.7% (up 29% from 9.1%)</strong> &mdash; the founder account&rsquo;s audience is highly engaged. The Base support tweet hit 17.74% ER, trading-is-hard tweet 18.97% ER, and the Sell High explainer 14.71% ER.</li>
+      <li><strong>The Sell High vault explainer (102 imp, 9 likes, 2 reposts, 2 clicks, 14.71% ER) was the best-converting tweet</strong> &mdash; explaining the &ldquo;how&rdquo; behind yield in simple terms drove the only URL clicks of the week.</li>
+      <li><strong>Likes jumped 24% to 46</strong> &mdash; matching the 2-weeks-ago peak despite lower impressions, showing the audience that does see the content is engaging at a higher rate.</li>
+      <li><strong>The Base support tweet (62 imp, 8 likes, 3 reposts, 17.74% ER) punched well above its weight</strong> &mdash; product announcements with a &ldquo;did you know&rdquo; hook drive strong engagement.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Total impressions dropped 47% to 1,045 (from 1,976)</strong> &mdash; a significant decline. The VIX/CPI tweet at 407 was the only tweet to break 100 impressions, while last week had two tweets above 700.</li>
+      <li><strong>Average impressions cratered to 105 (from 329, &minus;68%)</strong> &mdash; the worst in the 3-week window by far. More tweets at lower individual reach.</li>
+      <li><strong>URL clicks dropped to 2 (from 3)</strong> &mdash; and were concentrated in a single tweet (Sell High explainer). 9 of 10 tweets generated zero clicks.</li>
+      <li><strong>Zero replies on 9 of 10 tweets</strong> &mdash; the account still isn&rsquo;t generating conversation. The only reply came from a tagged engagement tweet.</li>
+      <li><strong>The VIX/CPI preview tweet (407 imp) had outsized reach but low engagement (2.21% ER, 0 clicks, 0 bookmarks)</strong> &mdash; the audience viewed it but didn&rsquo;t interact.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>The market-preview format works for reach but needs a CTA</strong> &mdash; the VIX tweet got 407 impressions but zero engagement actions. Add &ldquo;What&rsquo;s your take?&rdquo; or a vault positioning line to convert views into engagement.</li>
+      <li><strong>Double down on the &ldquo;how does it work&rdquo; format</strong> &mdash; the Sell High explainer was the only tweet to drive clicks. More &ldquo;Here&rsquo;s exactly how X works&rdquo; content, broken down simply.</li>
+      <li><strong>The &ldquo;did you know&rdquo; hook is strong</strong> &mdash; the Base support tweet&rsquo;s 17.74% ER proves that surprising/educational hooks land well. Try: &ldquo;Did you know you can earn X% on BTC?&rdquo; or &ldquo;Did you know our vaults have zero liquidation risk?&rdquo;</li>
+      <li><strong>Post at least 1 tweet per day</strong> &mdash; 10 tweets across 7 days is an improvement but some days still had zero activity. Consistent daily posting maintains algorithmic presence.</li>
+      <li><strong>Try threading the best educational tweets</strong> &mdash; the Sell High explainer and BTC yield tweets have enough depth for 2&ndash;3 tweet threads that could boost both reach and engagement.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Jul 13</td>
+            <td>We&rsquo;re at an interesting week for the markets right now. VIX - expected volatility&hellip;</td>
+            <td class="num">407</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2.21</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 14</td>
+            <td>Just when you thought we were out of the war -- We&rsquo;re back in&hellip;</td>
+            <td class="num">104</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.69</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 17</td>
+            <td>How do prodigy.fi Sell High vaults offer 11%+? Option premiums&hellip;</td>
+            <td class="num">102</td>
+            <td class="num">9</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">2</td>
+            <td class="num">14.71</td>
+          </tr>
+          <tr>
+            <td>Jul 17</td>
+            <td>One of the best traders to follow for general market direction&hellip;</td>
+            <td class="num">91</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">3.30</td>
+          </tr>
+          <tr>
+            <td>Jul 15</td>
+            <td>CPI came in today: Cool - cooling rate hike expectations&hellip;</td>
+            <td class="num">75</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.00</td>
+          </tr>
+          <tr>
+            <td>Jul 14</td>
+            <td>Bitcoin is crypto&rsquo;s most pristine asset - and the hardest to get yield on&hellip;</td>
+            <td class="num">71</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">14.08</td>
+          </tr>
+          <tr>
+            <td>Jul 16</td>
+            <td>Did you know we support Base? You can onboard to all our vaults easily&hellip;</td>
+            <td class="num">62</td>
+            <td class="num">8</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">17.74</td>
+          </tr>
+          <tr>
+            <td>Jul 16</td>
+            <td>Lot of stories like this Trading is hard - most traders lose&hellip;</td>
+            <td class="num">58</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">18.97</td>
+          </tr>
+          <tr>
+            <td>Jul 17</td>
+            <td>@grugcapital can be in this life, in eastern europe</td>
+            <td class="num">58</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">6.90</td>
+          </tr>
+          <tr>
+            <td>Jul 17</td>
+            <td>@0xDeantoshi @Yieldzio thanks for building yieldz! Great resource</td>
+            <td class="num">17</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">23.53</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Jul 21, 2026 &middot; 0xYield_Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
