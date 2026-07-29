@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xYield_Maxi Twitter Analytics — Week of Jul 20 – 26, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>0xYield_Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jul 20 &ndash; 26, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">9</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;10% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,572</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+20% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">175</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta up">+34% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">54</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+13% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">9.6%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">&minus;16% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">6</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+200% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jul 20&ndash;26 (this week)</td>
+            <td class="num">9</td>
+            <td class="num">1,572</td>
+            <td class="num">175</td>
+            <td class="num">54</td>
+            <td class="num">10</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">6</td>
+            <td class="num">9.6%</td>
+          </tr>
+          <tr>
+            <td>Jul 13&ndash;19 (last week)</td>
+            <td class="num">10</td>
+            <td class="num">1,305</td>
+            <td class="num">131</td>
+            <td class="num">48</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">11.4%</td>
+          </tr>
+          <tr>
+            <td>Jul 6&ndash;12 (2 wks ago)</td>
+            <td class="num">6</td>
+            <td class="num">2,067</td>
+            <td class="num">345</td>
+            <td class="num">37</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">3</td>
+            <td class="num">8.2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 9 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 22</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Second consecutive week of positive Bitcoin ETF inflows. First time since May. B&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">723 impressions</span>
+        <span>12 likes</span>
+        <span>4 reposts</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 4.29%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 21</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Strategy launched STRC as a savings account Buy around $100, get 11% dividends f&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">170 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 7.65%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 20</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>For the first time in a long while Bitcoin and Ethereum ETFs saw positive inflow&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">156 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.69%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 23</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>Morpho just launched fixed-rate lending on Base Fixed-rate lending on cbBTC: ~4%&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">140 impressions</span>
+        <span>7 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 12.14%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 20</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>If you want more options than prodigy.fi&rsquo;s main interface provides,&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">124 impressions</span>
+        <span>7 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 8.06%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 24</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>BlackRock, Strategy and Coinbase just formed a BTC Security Consortium: $15 mill&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">116 impressions</span>
+        <span>8 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 13.79%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 24</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>BTC is staring at $68K Volume shows $68-75K is full of sellers waiting to break&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">78 impressions</span>
+        <span>7 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 16.67%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 21</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>@0xTindorr @monad @saturn_credit interesting how high the AUSD PT is . good spot</div>
+      <div class="tweet-meta">
+        <span class="imp">38 impressions</span>
+        <span>1 like</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 5.26%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 22</div>
+      <div class="tweet-text"><span class="tweet-rank">9</span>@RichardPtardio @jtx_trade looks good. no wine spill this time, hopefully!</div>
+      <div class="tweet-meta">
+        <span class="imp">27 impressions</span>
+        <span>2 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 11.11%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>BTC ETF inflow tweet broke out at 723 impressions</strong> &mdash; nearly 5x the next best tweet. Timely market data with clear narrative (&ldquo;first time since May&rdquo;) drives outsized reach. Newsjacking with real data continues to be the #1 format for this account.</li>
+      <li><strong>URL clicks tripled to 6 (from 2 last week).</strong> The STRC tweet (2 clicks), Morpho tweet (2 clicks), prodigy.fi interface tweet (1 click), and BTC analysis tweet (1 click) all converted. Tweets that reference specific tools or products with clear utility drive clicks better than generic CTAs.</li>
+      <li><strong>Impressions up 20% and avg impressions up 34% week-over-week.</strong> With one fewer tweet than last week, reach per tweet improved significantly &mdash; quality over quantity continues to pay off.</li>
+      <li><strong>Competitor/industry coverage builds authority.</strong> The Morpho fixed-rate lending tweet (140 imp, 12.14% ER) and STRC tweet (170 imp, 7.65% ER) show that covering the broader DeFi landscape &mdash; not just Prodigy &mdash; positions the founder as a trusted voice.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Bookmarks dropped to 1 (from 4 last week).</strong> Only the ETF inflow tweet was bookmarked. The content this week leaned more toward news reaction than reference material. Vault breakdowns and educational content typically drive more saves.</li>
+      <li><strong>Engagement rate dipped from 11.4% to 9.6%.</strong> The 723-impression ETF tweet pulled a relatively low 4.29% ER, dragging the average down. High-reach tweets naturally have lower ER, but the lower-impression tweets also didn&rsquo;t compensate enough.</li>
+      <li><strong>Only 2 replies across all 9 tweets.</strong> The content is informative but not conversation-starting. Last week had 1 reply; two weeks ago had 0. This is a persistent gap &mdash; the founder tweets read as broadcasts rather than conversation starters.</li>
+      <li><strong>No vault-specific content this week.</strong> Previous weeks&rsquo; best performers included specific vault breakdowns with dollar amounts. This week was all macro/news commentary with no product-specific yield examples.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Pair every macro tweet with a vault tie-in.</strong> The ETF inflows tweet (723 imp) had no Prodigy connection. A reply thread or follow-up tweet like &ldquo;ETF inflows returning &rarr; volatility repricing &rarr; vault premiums rising&rdquo; would bridge the reach to product awareness.</li>
+      <li><strong>Bring back vault breakdowns.</strong> Previous weeks showed &ldquo;$341 on 1 BTC&rdquo; style tweets drive bookmarks and clicks. Add 1&ndash;2 per week with specific current vault opportunities and direct links.</li>
+      <li><strong>Add a question or opinion hook to drive replies.</strong> Instead of &ldquo;BlackRock formed a consortium&rdquo; (statement), try &ldquo;BlackRock formed a consortium &mdash; does this change anything for self-custody believers?&rdquo; Give the audience a reason to respond.</li>
+      <li><strong>Cross-reference @ProdigyFi content.</strong> The prodigy.fi interface tweet (124 imp, 8.06% ER, 1 click) performed well. QT-ing or building on ProdigyFi&rsquo;s best tweets has historically amplified both accounts.</li>
+      <li><strong>Continue the Morpho-style competitor coverage.</strong> Covering competitors/adjacent protocols (12.14% ER) builds trust and lets you position Prodigy naturally. &ldquo;Morpho launched fixed-rate at 4%. Prodigy vaults are running 30&ndash;60%. Here&rsquo;s why the difference matters&rdquo; &mdash; newsjacking competitors is underexploited.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Jul 22</td>
+            <td>Second consecutive week of positive Bitcoin ETF inflows. First time since May&hellip;</td>
+            <td class="num">723</td>
+            <td class="num">12</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">4.29</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 21</td>
+            <td>Strategy launched STRC as a savings account Buy around $100, get 11% dividends&hellip;</td>
+            <td class="num">170</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">7.65</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 20</td>
+            <td>For the first time in a long while Bitcoin and Ethereum ETFs saw positive inflow&hellip;</td>
+            <td class="num">156</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.69</td>
+          </tr>
+          <tr>
+            <td>Jul 23</td>
+            <td>Morpho just launched fixed-rate lending on Base Fixed-rate lending on cbBTC: ~4%&hellip;</td>
+            <td class="num">140</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">12.14</td>
+          </tr>
+          <tr>
+            <td>Jul 20</td>
+            <td>If you want more options than prodigy.fi&rsquo;s main interface provides,&hellip;</td>
+            <td class="num">124</td>
+            <td class="num">7</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">8.06</td>
+          </tr>
+          <tr>
+            <td>Jul 24</td>
+            <td>BlackRock, Strategy and Coinbase just formed a BTC Security Consortium: $15 mill&hellip;</td>
+            <td class="num">116</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">13.79</td>
+          </tr>
+          <tr>
+            <td>Jul 24</td>
+            <td>BTC is staring at $68K Volume shows $68-75K is full of sellers waiting to break&hellip;</td>
+            <td class="num">78</td>
+            <td class="num">7</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">16.67</td>
+          </tr>
+          <tr>
+            <td>Jul 21</td>
+            <td>@0xTindorr @monad @saturn_credit interesting how high the AUSD PT is . good spot</td>
+            <td class="num">38</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">5.26</td>
+          </tr>
+          <tr>
+            <td>Jul 22</td>
+            <td>@RichardPtardio @jtx_trade looks good. no wine spill this time, hopefully!</td>
+            <td class="num">27</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">11.11</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Jul 29, 2026 &middot; 0xYield_Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
