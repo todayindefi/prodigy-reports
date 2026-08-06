@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xYield_Maxi Twitter Analytics — Week of Jul 28 – Aug 3, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>0xYield_Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Jul 28 &ndash; Aug 3, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">10</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+11% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2,733</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+55% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">273</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta up">+40% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">70</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+30% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">9.7%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+4% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">7</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+17% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jul 28&ndash;Aug 3 (this week)</td>
+            <td class="num">10</td>
+            <td class="num">2,733</td>
+            <td class="num">273</td>
+            <td class="num">70</td>
+            <td class="num">13</td>
+            <td class="num">2</td>
+            <td class="num">3</td>
+            <td class="num">7</td>
+            <td class="num">9.7%</td>
+          </tr>
+          <tr>
+            <td>Jul 20&ndash;26 (last week)</td>
+            <td class="num">9</td>
+            <td class="num">1,758</td>
+            <td class="num">195</td>
+            <td class="num">54</td>
+            <td class="num">10</td>
+            <td class="num">2</td>
+            <td class="num">2</td>
+            <td class="num">6</td>
+            <td class="num">9.3%</td>
+          </tr>
+          <tr>
+            <td>Jul 13&ndash;19 (2 wks ago)</td>
+            <td class="num">10</td>
+            <td class="num">1,319</td>
+            <td class="num">132</td>
+            <td class="num">48</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">11.3%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 10 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 3</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Coldcard was exploited for $89M. Now everyone&rsquo;s asking: is my hardware wallet safe? Ledger: uses a secure element chip with its own certified RNG&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">830 impressions</span>
+        <span>7 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 3.25%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 31</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>Ethereum&rsquo;s Glamsterdam hard fork is targeting end of August. It&rsquo;s the biggest L1 upgrade since The Merge&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">687 impressions</span>
+        <span>13 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 4.66%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 28</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>If you&rsquo;re sitting in stables earning 3-5% on Aave or Morpho, you&rsquo;re leaving money on the table&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">489 impressions</span>
+        <span>7 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>2 bookmarks</span>
+        <span>4 clicks</span>
+        <span>ER: 4.91%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 3</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>The ColdCard hack is ripping through the Bitcoin Community and causing fear and panic. Ethereum&rsquo;s mo&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">166 impressions</span>
+        <span>7 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 10.84%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 31</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>Last Tuesday I posted about $1,800 ETH buy low vaults while ETH was at $1,935. ETH is now at $1,880&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">134 impressions</span>
+        <span>8 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 11.19%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 28</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>$24.1M drained from AFX bridge via compromised validators. $7.5M gone from VerusCoin bridge through forged proofs&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">129 impressions</span>
+        <span>6 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 10.08%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 29</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>ETH L2 TVL just hit a 2-year low, while Morgan Stanley launched ETH ETFs with the lowest fees on the market&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">119 impressions</span>
+        <span>7 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 8.4%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 30</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>ETH is now $1,917 prodigy.fi Buy Low vault: 59.2% APY at $1,875, 2-day expiry&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">75 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 14.67%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 30</div>
+      <div class="tweet-text"><span class="tweet-rank">9</span>The Fed held rates steady today. 3 members pushed for a hike. crypto didn&rsquo;t flinch&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">69 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 8.7%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 29</div>
+      <div class="tweet-text"><span class="tweet-rank">10</span>ETH at $1,901 right now. here&rsquo;s what prodigy.fi vaults are paying today: Buy low&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">35 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 20.0%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Best week in 3 weeks across every metric.</strong> Impressions up 55%, avg impressions up 40%, likes up 30%, clicks up 17%. The account is on an upward trajectory &mdash; three consecutive weeks of improvement since Jul 13&ndash;19.</li>
+      <li><strong>Coldcard security thread broke out at 830 impressions.</strong> The hardware wallet explainer comparing Ledger/Trezor/multisig architectures was the week&rsquo;s top performer. Security-authority content drives reach when there&rsquo;s a live news event to anchor it.</li>
+      <li><strong>Glamsterdam hard fork tweet hit 687 impressions with 13 likes.</strong> Educational ETH alpha content &mdash; sourced from actual EIPs, not summaries &mdash; resonated strongly. This was the highest-liked tweet of the week.</li>
+      <li><strong>Clean tweets outperformed shill tweets again.</strong> Top 2 tweets (830 imp, 687 imp) were both clean. The pattern holds: non-shill content drives reach, shill content converts within existing audience.</li>
+      <li><strong>Vault &ldquo;receipt&rdquo; tweet worked.</strong> The $1,800 buy low follow-up (134 imp, 11.19% ER) &mdash; reporting back that the vault expired profitably &mdash; was a strong trust-building format.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Bookmarks dropped to 3 (from 2 last week, 4 two weeks ago).</strong> Only the Aave comparison tweet (2 bkmrks) and Coldcard tweet (1 bkmrk) were saved. The educational content this week was more news-reactive than reference-worthy.</li>
+      <li><strong>Replies still stuck at 2.</strong> Three consecutive weeks at 1&ndash;2 replies. The content reads as broadcast &mdash; informative but not conversation-starting. No tweets this week included questions or opinion hooks that invite responses.</li>
+      <li><strong>Short vault CTA tweets underperformed.</strong> The two vault pricing tweets (75 imp, 35 imp) were the lowest-performing of the week. Specific vault numbers without context or narrative don&rsquo;t drive reach &mdash; they work better as thread replies to high-performing parent tweets.</li>
+      <li><strong>Fed tweet underperformed at 69 impressions.</strong> The macro take on rates landed flat despite being timely. Possible reason: too many accounts posting the same take. The Coldcard/Glamsterdam tweets had more unique angles.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Double down on security-authority content.</strong> Coldcard thread + follow-up = 996 combined impressions. When there&rsquo;s a live security incident, being the account that explains what actually happened (technically, not just &ldquo;stay safe&rdquo;) drives outsized reach. Build a reputation as the go-to security explainer in DeFi.</li>
+      <li><strong>Continue the educational EIP/protocol analysis format.</strong> The Glamsterdam tweet (687 imp, 13 likes) proved that deep, sourced ETH research drives engagement. Look for the next EIP or protocol proposal to break down.</li>
+      <li><strong>Use vault CTA tweets as thread replies, not standalone posts.</strong> The $59.2% APY tweet (75 imp) and vault pricing tweet (35 imp) got buried. Instead, post them as reply threads to the high-reach clean tweets &mdash; bridge the 830 impression audience to the product.</li>
+      <li><strong>Add opinion hooks to drive replies.</strong> Try ending tweets with a question or contrarian take: &ldquo;does this change anything for solo stakers?&rdquo; or &ldquo;is 1.2% enough to justify running a validator?&rdquo; The audience engages with takes, not just information.</li>
+      <li><strong>Test the vault &ldquo;receipt&rdquo; format weekly.</strong> The $1,800 buy low follow-up (134 imp, 11.19% ER) is a trust-building flywheel &mdash; post vault opportunities, then report back on results. Repeat this consistently.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Aug 3</td>
+            <td>Coldcard was exploited for $89M. Now everyone&rsquo;s asking: is my hardware wallet safe?&hellip;</td>
+            <td class="num">830</td>
+            <td class="num">7</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">3.25</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 31</td>
+            <td>Ethereum&rsquo;s Glamsterdam hard fork is targeting end of August. It&rsquo;s the biggest L1 upgrade since The Merge&hellip;</td>
+            <td class="num">687</td>
+            <td class="num">13</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">4.66</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 28</td>
+            <td>If you&rsquo;re sitting in stables earning 3-5% on Aave or Morpho, you&rsquo;re leaving money on the table&hellip;</td>
+            <td class="num">489</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">4</td>
+            <td class="num">4.91</td>
+          </tr>
+          <tr>
+            <td>Aug 3</td>
+            <td>The ColdCard hack is ripping through the Bitcoin Community and causing fear and panic&hellip;</td>
+            <td class="num">166</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">10.84</td>
+          </tr>
+          <tr>
+            <td>Jul 31</td>
+            <td>Last Tuesday I posted about $1,800 ETH buy low vaults while ETH was at $1,935&hellip;</td>
+            <td class="num">134</td>
+            <td class="num">8</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">11.19</td>
+          </tr>
+          <tr>
+            <td>Jul 28</td>
+            <td>$24.1M drained from AFX bridge via compromised validators. $7.5M gone from VerusCoin bridge&hellip;</td>
+            <td class="num">129</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">10.08</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>ETH L2 TVL just hit a 2-year low, while Morgan Stanley launched ETH ETFs&hellip;</td>
+            <td class="num">119</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.4</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>ETH is now $1,917 prodigy.fi Buy Low vault: 59.2% APY at $1,875, 2-day expiry&hellip;</td>
+            <td class="num">75</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">14.67</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>The Fed held rates steady today. 3 members pushed for a hike. crypto didn&rsquo;t flinch&hellip;</td>
+            <td class="num">69</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.7</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>ETH at $1,901 right now. here&rsquo;s what prodigy.fi vaults are paying today: Buy low&hellip;</td>
+            <td class="num">35</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">20.0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Aug 5, 2026 &middot; 0xYield_Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
