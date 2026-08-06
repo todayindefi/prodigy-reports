@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy.fi Twitter Analytics — Week of Jul 28 – Aug 3, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi (Project Account) Weekly Performance Report</div>
+    <div class="date-range">Jul 28 &ndash; Aug 3, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">45</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;6% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">5,269</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+4% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">117</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta up">+11% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">122</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+9% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">3.5%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+13% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;50% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jul 28&ndash;Aug 3 (this week)</td>
+            <td class="num">45</td>
+            <td class="num">5,269</td>
+            <td class="num">117</td>
+            <td class="num">122</td>
+            <td class="num">55</td>
+            <td class="num">51</td>
+            <td class="num">70</td>
+            <td class="num">1</td>
+            <td class="num">3.5%</td>
+          </tr>
+          <tr>
+            <td>Jul 20&ndash;26 (last week)</td>
+            <td class="num">48</td>
+            <td class="num">5,062</td>
+            <td class="num">105</td>
+            <td class="num">112</td>
+            <td class="num">50</td>
+            <td class="num">47</td>
+            <td class="num">43</td>
+            <td class="num">2</td>
+            <td class="num">3.1%</td>
+          </tr>
+          <tr>
+            <td>Jul 13&ndash;19 (2 wks ago)</td>
+            <td class="num">57</td>
+            <td class="num">6,068</td>
+            <td class="num">106</td>
+            <td class="num">168</td>
+            <td class="num">61</td>
+            <td class="num">83</td>
+            <td class="num">53</td>
+            <td class="num">5</td>
+            <td class="num">4.4%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 12 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 2</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>ETH outran BTC more than two to one in July, and it&rsquo;s the one still holding its trendline. $1,800 is&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">538 impressions</span>
+        <span>8 likes</span>
+        <span>4 reposts</span>
+        <span>6 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 4.46%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 30</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>July is on track for the weakest bitcoin spot volume since November 2023, per K33 Research. quiet ma&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">470 impressions</span>
+        <span>8 likes</span>
+        <span>4 reposts</span>
+        <span>5 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 4.68%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 31</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>expected price movement has been priced low for a full quarter. premiums move like that. the quote y&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">453 impressions</span>
+        <span>12 likes</span>
+        <span>4 reposts</span>
+        <span>8 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 4.64%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 3</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>BTC and ETH ETFs both saw outflows today. on the week they split, bitcoin down, ether up 1,573 ETH&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">425 impressions</span>
+        <span>7 likes</span>
+        <span>5 reposts</span>
+        <span>5 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 5.41%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 28</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>the yield is already yours the moment you deposit into a prodigy.fi vault. it doesn&rsquo;t change&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">417 impressions</span>
+        <span>6 likes</span>
+        <span>3 reposts</span>
+        <span>4 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 3.6%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 1</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>you already have a price you&rsquo;d buy BTC at. a structured yield vault is the only thing that pays you&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">403 impressions</span>
+        <span>16 likes</span>
+        <span>5 reposts</span>
+        <span>10 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.95%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 29</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>Citadel is betting on a rate hike today. everyone else thinks they&rsquo;re wrong. the Fed announces at 2p&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">400 impressions</span>
+        <span>6 likes</span>
+        <span>3 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 3.5%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 3</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>opening an options account at a traditional broker takes days. net worth verification, a trading exp&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">328 impressions</span>
+        <span>10 likes</span>
+        <span>7 reposts</span>
+        <span>5 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.93%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 28</div>
+      <div class="tweet-text"><span class="tweet-rank">9</span>ETH pulled back from $1,955 to $1,879 on FOMC day. if you think $2,000 holds as resistance for now,&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">315 impressions</span>
+        <span>8 likes</span>
+        <span>4 reposts</span>
+        <span>5 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.67%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 31</div>
+      <div class="tweet-text"><span class="tweet-rank">10</span>a linked price is not a limit order. a limit order fills the moment price touches it. you can cancel&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">312 impressions</span>
+        <span>14 likes</span>
+        <span>7 reposts</span>
+        <span>9 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 9.62%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 29</div>
+      <div class="tweet-text"><span class="tweet-rank">11</span>floating rates are fine until you need to plan around them.</div>
+      <div class="tweet-meta">
+        <span class="imp">303 impressions</span>
+        <span>7 likes</span>
+        <span>5 reposts</span>
+        <span>7 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 5.61%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Jul 30</div>
+      <div class="tweet-text"><span class="tweet-rank">12</span>you&rsquo;re paid to take the other side of a price move. that&rsquo;s the product, and it&rsquo;s worth being specifi&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">279 impressions</span>
+        <span>7 likes</span>
+        <span>4 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.45%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Bookmarks surged to 70 &mdash; up 63% from 43 last week.</strong> This is a significant signal: the audience is saving content for reference. The &ldquo;linked price vs limit order&rdquo; explainer (9 bkmrks), &ldquo;structured yield vault&rdquo; tweet (10 bkmrks), and &ldquo;premiums priced low for a quarter&rdquo; tweet (8 bkmrks) drove the most saves. Educational content about vault mechanics is bookmark-worthy.</li>
+      <li><strong>Per-tweet performance improved across the board.</strong> Avg impressions up 11% (117 vs 105), avg ER up 13% (3.5% vs 3.1%), with fewer tweets (45 vs 48). Quality over quantity continues to pay off.</li>
+      <li><strong>Product education tweets drove the best engagement.</strong> The &ldquo;linked price is not a limit order&rdquo; tweet (312 imp, 9.62% ER, 9 bkmrks, 14 likes) and &ldquo;structured yield vault&rdquo; tweet (403 imp, 6.95% ER, 10 bkmrks, 16 likes) were the top engagement performers. Explaining how the product actually works outperforms generic CTA content.</li>
+      <li><strong>Market context tweets maintained strong reach.</strong> ETH vs BTC comparison (538 imp), weak BTC volume (470 imp), and Citadel/Fed take (400 imp) all broke 400 impressions. Tying market data to vault positioning continues to work.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>URL clicks dropped to 1 &mdash; the worst on record.</strong> Only 1 click from 5,269 impressions (0.02% CTR). This has been a persistent problem but hit a new low. The content is engaging but not converting to site visits at all.</li>
+      <li><strong>Likes and replies declined vs 2 weeks ago.</strong> Likes: 122 this week vs 168 two weeks ago (&minus;27%). Replies: 51 vs 83 (&minus;39%). The week-over-week trend is positive (up from last week) but the broader trajectory from Jul 13&ndash;19 is still down.</li>
+      <li><strong>Reply tweets still account for ~73% of volume but ~3% of impressions.</strong> 33 of 45 tweets are replies to the same 5 accounts, averaging 18 impressions each. The ratio hasn&rsquo;t improved.</li>
+      <li><strong>Zero clicks on top-performing tweets.</strong> The top 4 tweets by impressions (538, 470, 453, 425 combined = 1,886 imp) generated 0 URL clicks between them. High-reach content isn&rsquo;t driving any traffic to the product.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Add direct links to top-performing tweet formats.</strong> The market context and product education tweets are getting 400&ndash;500 impressions with 0 clicks. Embed a prodigy.fi link directly into these tweets &mdash; at this follower scale, links don&rsquo;t suppress reach.</li>
+      <li><strong>Build a weekly &ldquo;vault explainer&rdquo; series around the bookmark winners.</strong> The linked-price and structured-vault tweets earned 9&ndash;10 bookmarks each. Create a recurring format: one concept explained per tweet, with a specific vault example and link. These are the tweets people want to reference.</li>
+      <li><strong>Continue reducing reply volume.</strong> Cut the formulaic replies to 1&ndash;2 substantive ones per day. Reallocate that effort to original content &mdash; the data consistently shows original tweets drive 97% of impressions.</li>
+      <li><strong>Test a &ldquo;vault receipt&rdquo; tweet on the ProdigyFi account.</strong> The Yield Maxi account saw strong engagement (134 imp, 11.19% ER) with a follow-up tweet reporting that a previously-shilled vault expired profitably. Replicate this format on the project account.</li>
+      <li><strong>Experiment with thread format for educational content.</strong> The &ldquo;linked price vs limit order&rdquo; topic (312 imp, 9.62% ER, 9 bkmrks) deserves a 3&ndash;4 tweet thread that goes deeper and ends with a specific vault CTA + link.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Aug 2</td>
+            <td>ETH outran BTC more than two to one in July, and it&rsquo;s the one still holding its trendline. $1,800 is&hellip;</td>
+            <td class="num">538</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">4.46</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 30</td>
+            <td>July is on track for the weakest bitcoin spot volume since November 2023, per K33 Research. quiet ma&hellip;</td>
+            <td class="num">470</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">4.68</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 31</td>
+            <td>expected price movement has been priced low for a full quarter. premiums move like that. the quote y&hellip;</td>
+            <td class="num">453</td>
+            <td class="num">12</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">4.64</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 3</td>
+            <td>BTC and ETH ETFs both saw outflows today. on the week they split, bitcoin down, ether up 1,573 ETH&hellip;</td>
+            <td class="num">425</td>
+            <td class="num">7</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">5.41</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Jul 28</td>
+            <td>the yield is already yours the moment you deposit into a prodigy.fi vault. it doesn&rsquo;t change&hellip;</td>
+            <td class="num">417</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">3.60</td>
+          </tr>
+          <tr>
+            <td>Aug 1</td>
+            <td>you already have a price you&rsquo;d buy BTC at. a structured yield vault is the only thing that pays you&hellip;</td>
+            <td class="num">403</td>
+            <td class="num">16</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">6.95</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>Citadel is betting on a rate hike today. everyone else thinks they&rsquo;re wrong. the Fed announces at 2p&hellip;</td>
+            <td class="num">400</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3.50</td>
+          </tr>
+          <tr>
+            <td>Aug 3</td>
+            <td>opening an options account at a traditional broker takes days. net worth verification, a trading exp&hellip;</td>
+            <td class="num">328</td>
+            <td class="num">10</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">7.93</td>
+          </tr>
+          <tr>
+            <td>Jul 28</td>
+            <td>ETH pulled back from $1,955 to $1,879 on FOMC day. if you think $2,000 holds as resistance for now,&hellip;</td>
+            <td class="num">315</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">6.67</td>
+          </tr>
+          <tr>
+            <td>Jul 31</td>
+            <td>a linked price is not a limit order. a limit order fills the moment price touches it. you can cancel&hellip;</td>
+            <td class="num">312</td>
+            <td class="num">14</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">9</td>
+            <td class="num">0</td>
+            <td class="num">9.62</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>floating rates are fine until you need to plan around them.</td>
+            <td class="num">303</td>
+            <td class="num">7</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">5.61</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>you&rsquo;re paid to take the other side of a price move. that&rsquo;s the product, and it&rsquo;s worth being specifi&hellip;</td>
+            <td class="num">279</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">6.45</td>
+          </tr>
+          <!-- Reply tweets -->
+          <tr>
+            <td>Jul 28</td>
+            <td>@bigjercrypto love seeing you win</td>
+            <td class="num">34</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>@bigjercrypto that&rsquo;s the spirit</td>
+            <td class="num">32</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>@bigjercrypto we stay building</td>
+            <td class="num">30</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 31</td>
+            <td>@bigjercrypto you already know</td>
+            <td class="num">28</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 1</td>
+            <td>@bigjercrypto LFGGGG</td>
+            <td class="num">26</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 2</td>
+            <td>@bigjercrypto always here for you</td>
+            <td class="num">24</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 3</td>
+            <td>@bigjercrypto</td>
+            <td class="num">22</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 28</td>
+            <td>@bigjercrypto we got you covered</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>@bigjercrypto</td>
+            <td class="num">18</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 1</td>
+            <td>@bigjercrypto yield is the way</td>
+            <td class="num">16</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 28</td>
+            <td>@poppyduckk we appreciate you</td>
+            <td class="num">16</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>@poppyduckk exactly right</td>
+            <td class="num">15</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 31</td>
+            <td>@poppyduckk well said</td>
+            <td class="num">14</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 2</td>
+            <td>@poppyduckk</td>
+            <td class="num">14</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 3</td>
+            <td>@poppyduckk you know it</td>
+            <td class="num">13</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 28</td>
+            <td>@poppyduckk that&rsquo;s the move</td>
+            <td class="num">12</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>@poppyduckk</td>
+            <td class="num">12</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>@feisi1117 patience pays</td>
+            <td class="num">12</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 31</td>
+            <td>@feisi1117</td>
+            <td class="num">11</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 2</td>
+            <td>@feisi1117 yield is king</td>
+            <td class="num">11</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 28</td>
+            <td>@feisi1117 structured products are the future</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 1</td>
+            <td>@feisi1117</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 3</td>
+            <td>@feisi1117 always a good time to earn</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 29</td>
+            <td>@jhodybaadillah love the energy</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 31</td>
+            <td>@jhodybaadillah that&rsquo;s what we like to hear</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 2</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">9</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 28</td>
+            <td>@jhodybaadillah we&rsquo;re just getting started</td>
+            <td class="num">9</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>@jhodybaadillah yes fixed yield is the way</td>
+            <td class="num">9</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 1</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 3</td>
+            <td>@jhodybaadillah keep stacking</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Jul 30</td>
+            <td>@Divathe_great we appreciate you</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 1</td>
+            <td>@Divathe_great don&rsquo;t sleep on structured yield</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 2</td>
+            <td>@poppyduckk real ones know</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Aug 5, 2026 &middot; ProdigyFi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
