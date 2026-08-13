@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xYield_Maxi Twitter Analytics — Week of Aug 4 – Aug 10, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>0xYield_Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Aug 4 &ndash; Aug 10, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">9</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;10% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1,361</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;51% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">151</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;46% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">49</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;30% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">7.0%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">&minus;25% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">3</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;57% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aug 4&ndash;10 (this week)</td>
+            <td class="num">9</td>
+            <td class="num">1,361</td>
+            <td class="num">151</td>
+            <td class="num">49</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">7.0%</td>
+          </tr>
+          <tr>
+            <td>Jul 28&ndash;Aug 3 (last week)</td>
+            <td class="num">10</td>
+            <td class="num">2,805</td>
+            <td class="num">281</td>
+            <td class="num">70</td>
+            <td class="num">13</td>
+            <td class="num">2</td>
+            <td class="num">3</td>
+            <td class="num">7</td>
+            <td class="num">9.3%</td>
+          </tr>
+          <tr>
+            <td>Jul 20&ndash;26 (2 wks ago)</td>
+            <td class="num">9</td>
+            <td class="num">1,776</td>
+            <td class="num">197</td>
+            <td class="num">54</td>
+            <td class="num">10</td>
+            <td class="num">2</td>
+            <td class="num">2</td>
+            <td class="num">6</td>
+            <td class="num">9.2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 9 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 5</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Ethereum researchers proposed EIP-8361: burn validator rewards to cap staking at 50% of supply. If implemented today, staking yield drops from 2.6% to 1.2%&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">385 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>3 clicks</span>
+        <span>ER: 4.68%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 4</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>BREAKING - Bessent says &lsquo;there may be deal Tuesday or Wednesday to open Hormuz with freedom of move&hellip;&rsquo;</div>
+      <div class="tweet-meta">
+        <span class="imp">195 impressions</span>
+        <span>7 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 5.13%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 4</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>DEXs just captured a record 24% of all spot crypto trading volume. A year ago it was ~15%&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">182 impressions</span>
+        <span>7 likes</span>
+        <span>2 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.04%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 4</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>If you were trading the news these last few weeks or days, you&rsquo;ve probably been chopped to pieces&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">125 impressions</span>
+        <span>6 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.2%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 5</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>Options yield like prodigy.fi works differently from other farms. Choppy markets like we have now&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">123 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 8.13%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 10</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>The coldcard exploit was likely found by AI &mdash; AI could brute-force weak entropy humans missed for 5&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">105 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.67%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 6</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>Eth has been leaving exchanges this month, while price has been building higher. Is the bottom in?&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">98 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.14%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 10</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>Besides our main, simplified interface prodigy.fi also has a more advanced &lsquo;Pro Earn&rsquo; in&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">76 impressions</span>
+        <span>4 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.89%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 7</div>
+      <div class="tweet-text"><span class="tweet-rank">9</span>Japanese savers know the cost of a falling currency. But even stronger currencies like USD devalue ov&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">72 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 9.72%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>EIP-8361 tweet led the week at 385 impressions with 3 URL clicks.</strong> Educational governance content remains the strongest format &mdash; the same pattern as the Glamsterdam tweet (687 imp) the week before.</li>
+      <li><strong>Newsjacking still drives above-average reach.</strong> Bessent/Hormuz (195 imp) and DEX 24% market share (182 imp) both outperformed the weekly average. Timely market takes continue to land.</li>
+      <li><strong>Consistent posting cadence.</strong> 9 tweets across the week, evenly distributed. No gaps or bursts.</li>
+      <li><strong>Engagement rate held above 7%.</strong> Down from last week&rsquo;s 9.3% but still strong relative to the broader account history. The audience is engaged with the content.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Impressions dropped 51% after last week&rsquo;s breakout.</strong> The Coldcard thread (830 imp) and Glamsterdam breakdown (687 imp) were unique first-mover content. This week lacked that caliber of deep research tweet.</li>
+      <li><strong>Zero bookmarks and zero replies across all 9 tweets.</strong> No tweet was reference-worthy or conversation-starting. The content was informative but not differentiated enough to save or respond to.</li>
+      <li><strong>Shill tweets underperformed again.</strong> &ldquo;Options yield&rdquo; tweet (123 imp) and &ldquo;Pro Earn&rdquo; tweet (76 imp) were the two weakest original tweets. Standalone product mentions continue to get the lowest reach.</li>
+      <li><strong>Reposts dropped to 7 (from 13).</strong> Less shareworthy content this week &mdash; the tweets were good but not &ldquo;I need to share this&rdquo; caliber.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Invest in 1&ndash;2 deep research tweets per week.</strong> The data is clear: Coldcard RCA (830 imp), Glamsterdam EIP breakdown (687 imp), and EIP-8361 (385 imp) are the breakout formats. These take more effort but drive 3&ndash;5x average reach. Identify the next complex topic to explain simply.</li>
+      <li><strong>Use product mentions as thread replies, not standalone tweets.</strong> The &ldquo;Pro Earn&rdquo; tweet (76 imp) as a standalone got buried. Instead, reply-thread it to a high-reach clean tweet to bridge the audience.</li>
+      <li><strong>Add opinion hooks to drive replies.</strong> Zero replies for the second consecutive week. End tweets with questions or contrarian takes: &ldquo;is 1.2% enough to justify running a validator?&rdquo; gives the audience something to respond to.</li>
+      <li><strong>Test a weekly &ldquo;vault receipt&rdquo; recap.</strong> The previous $1,800 vault follow-up (134 imp, 11.19% ER) was a trust-building format. Make it consistent &mdash; post vault opportunities early in the week, report results at expiry.</li>
+      <li><strong>Don&rsquo;t abandon the coldcard/security angle.</strong> The AI-vs-coldcard tweet (105 imp) on a Sunday is decent. The security authority niche is still underexploited &mdash; look for the next incident to provide the first credible breakdown.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Aug 5</td>
+            <td>Ethereum researchers proposed EIP-8361: burn validator rewards to cap staking at 50% of supply&hellip;</td>
+            <td class="num">385</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">4.68</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 4</td>
+            <td>BREAKING - Bessent says &lsquo;there may be deal Tuesday or Wednesday to open Hormuz with freedom of move&hellip;&rsquo;</td>
+            <td class="num">195</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">5.13</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 4</td>
+            <td>DEXs just captured a record 24% of all spot crypto trading volume. A year ago it was ~15%&hellip;</td>
+            <td class="num">182</td>
+            <td class="num">7</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.04</td>
+          </tr>
+          <tr>
+            <td>Aug 4</td>
+            <td>If you were trading the news these last few weeks or days, you&rsquo;ve probably been chopped to pieces&hellip;</td>
+            <td class="num">125</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.2</td>
+          </tr>
+          <tr>
+            <td>Aug 5</td>
+            <td>Options yield like prodigy.fi works differently from other farms. Choppy markets like we have now&hellip;</td>
+            <td class="num">123</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.13</td>
+          </tr>
+          <tr>
+            <td>Aug 10</td>
+            <td>The coldcard exploit was likely found by AI &mdash; AI could brute-force weak entropy humans missed for 5&hellip;</td>
+            <td class="num">105</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">6.67</td>
+          </tr>
+          <tr>
+            <td>Aug 6</td>
+            <td>Eth has been leaving exchanges this month, while price has been building higher. Is the bottom in?&hellip;</td>
+            <td class="num">98</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.14</td>
+          </tr>
+          <tr>
+            <td>Aug 10</td>
+            <td>Besides our main, simplified interface prodigy.fi also has a more advanced &lsquo;Pro Earn&rsquo; in&hellip;</td>
+            <td class="num">76</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.89</td>
+          </tr>
+          <tr>
+            <td>Aug 7</td>
+            <td>Japanese savers know the cost of a falling currency. But even stronger currencies like USD devalue ov&hellip;</td>
+            <td class="num">72</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">9.72</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Aug 13, 2026 &middot; 0xYield_Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
