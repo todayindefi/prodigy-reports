@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy.fi Twitter Analytics — Week of Aug 4 – Aug 10, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi (Project Account) Weekly Performance Report</div>
+    <div class="date-range">Aug 4 &ndash; Aug 10, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">30</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;33% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">14,029</div>
+      <div class="label">Impressions</div>
+      <div class="delta up">+132% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">468</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta up">+249% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">110</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;10% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1.9%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta down">&minus;42% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">7</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta up">+600% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aug 4&ndash;10 (this week)</td>
+            <td class="num">30</td>
+            <td class="num">14,029</td>
+            <td class="num">468</td>
+            <td class="num">110</td>
+            <td class="num">50</td>
+            <td class="num">40</td>
+            <td class="num">44</td>
+            <td class="num">7</td>
+            <td class="num">1.9%</td>
+          </tr>
+          <tr>
+            <td>Jul 28&ndash;Aug 3 (last week)</td>
+            <td class="num">45</td>
+            <td class="num">6,040</td>
+            <td class="num">134</td>
+            <td class="num">122</td>
+            <td class="num">55</td>
+            <td class="num">51</td>
+            <td class="num">70</td>
+            <td class="num">1</td>
+            <td class="num">3.3%</td>
+          </tr>
+          <tr>
+            <td>Jul 20&ndash;26 (2 wks ago)</td>
+            <td class="num">48</td>
+            <td class="num">5,145</td>
+            <td class="num">107</td>
+            <td class="num">112</td>
+            <td class="num">50</td>
+            <td class="num">47</td>
+            <td class="num">43</td>
+            <td class="num">2</td>
+            <td class="num">3.1%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 12 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 7</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>five weeks ago, three Fed officials voted to hike rates. today the economy printed a loss of 23,000&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">2,586 impressions</span>
+        <span>7 likes</span>
+        <span>3 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 0.77%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 5</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>for the first time in the history of the chart, the S&amp;P 500 has held above its 200-week average&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">2,466 impressions</span>
+        <span>7 likes</span>
+        <span>5 reposts</span>
+        <span>4 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 1.78%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 6</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>&lsquo;what&rsquo;s your win rate?&rsquo; &lsquo;on what?&rsquo; &lsquo;trades.&rsquo; &lsquo;I&rsquo;ve got two positions and they both expire Friday.&rsquo;</div>
+      <div class="tweet-meta">
+        <span class="imp">2,068 impressions</span>
+        <span>10 likes</span>
+        <span>5 reposts</span>
+        <span>5 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 1.45%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 10</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>BTC ETFs took $853 million last week, their best since April. ether added $245 million, also its bes&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">1,505 impressions</span>
+        <span>6 likes</span>
+        <span>3 reposts</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 1.0%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 8</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>every holder has a number they&rsquo;d sell at. prodigy.fi pays you to name it. anywhere else&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">907 impressions</span>
+        <span>11 likes</span>
+        <span>3 reposts</span>
+        <span>4 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 3.42%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 9</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>if you&rsquo;d sell ETH at $2,000, this vault pays you $362 on 20 ETH to say so now. it settles August 21&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">819 impressions</span>
+        <span>13 likes</span>
+        <span>3 reposts</span>
+        <span>5 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 5.01%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 4</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>a vault has no liquidation price. it isn&rsquo;t a leveraged position. your deposit is committed through e&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">659 impressions</span>
+        <span>7 likes</span>
+        <span>4 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 2.43%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 7</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>a linked price isn&rsquo;t your BTC prediction. it&rsquo;s the settlement line, and it sets your rate. set it cl&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">652 impressions</span>
+        <span>10 likes</span>
+        <span>5 reposts</span>
+        <span>4 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 4.91%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 6</div>
+      <div class="tweet-text"><span class="tweet-rank">9</span>$66,500 is 2.6% above where BTC is now. payrolls Friday is what decides whether it gets there. $430&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">562 impressions</span>
+        <span>10 likes</span>
+        <span>5 reposts</span>
+        <span>5 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 4.98%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 5</div>
+      <div class="tweet-text"><span class="tweet-rank">10</span>ways to have a price in mind.</div>
+      <div class="tweet-meta">
+        <span class="imp">540 impressions</span>
+        <span>7 likes</span>
+        <span>4 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 3.89%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 4</div>
+      <div class="tweet-text"><span class="tweet-rank">11</span>prediction markets put the highest odds on BTC closing today between $62,000 and $64,000. analyst fo&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">536 impressions</span>
+        <span>9 likes</span>
+        <span>5 reposts</span>
+        <span>5 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 4.85%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 10</div>
+      <div class="tweet-text"><span class="tweet-rank">12</span>a bond coupon pays you for lending money to an issuer, who owes the principal back on a schedule. st&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">405 impressions</span>
+        <span>8 likes</span>
+        <span>5 reposts</span>
+        <span>2 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 6.17%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Impressions exploded to 14,029 &mdash; up 132% and the best week since early March.</strong> Avg impressions per tweet nearly tripled (468 vs 134). The algorithm is distributing content well beyond the follower base.</li>
+      <li><strong>Macro-anchored content drove breakout reach.</strong> The Fed/payrolls tweet (2,586 imp), S&amp;P 200-week chart tweet (2,466 imp), and ETF inflows tweet (1,505 imp) all broke 1,000+ impressions. Tying vault positioning to real-world events is the proven formula.</li>
+      <li><strong>The &ldquo;win rate&rdquo; dialogue tweet showed personality works on the brand account.</strong> 2,068 impressions on a creative, almost meme-like format proves ProdigyFi can have a voice beyond data and education.</li>
+      <li><strong>URL clicks jumped 600% to 7.</strong> Specific vault examples with dollar amounts (&ldquo;$362 on 20 ETH,&rdquo; &ldquo;$430 on $100K&rdquo;) drove clicks. The &ldquo;sell ETH at $2,000&rdquo; tweet (819 imp, 2 clicks) and &ldquo;linked price sets your rate&rdquo; tweet (652 imp, 2 clicks) were the top converters.</li>
+      <li><strong>Tweet volume reduced to 30 (from 45) with 2.3x the impressions.</strong> The quality-over-quantity thesis is now proven at scale for the project account.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Engagement rate dropped to 1.9% &mdash; lowest in weeks.</strong> This is the expected tradeoff of high-reach content hitting cold audiences who don&rsquo;t engage. Not necessarily bad, but worth monitoring if it persists.</li>
+      <li><strong>Bookmarks dropped from 70 to 44.</strong> Last week&rsquo;s product explainer content (linked price vs limit order) was more save-worthy. This week&rsquo;s macro content gets consumed but not referenced.</li>
+      <li><strong>Likes flat at 110 despite 2.3x impressions.</strong> The new audience reached this week is watching but not engaging yet &mdash; typical for breakout weeks.</li>
+      <li><strong>Top 4 tweets by impressions (7,625 combined) generated 0 URL clicks.</strong> The highest-reach content still isn&rsquo;t converting to site visits. The macro tweets that break out don&rsquo;t include product links.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Keep tweet volume at ~30/week (4&ndash;5/day).</strong> The data is definitive: fewer, higher-quality tweets massively outperform high-volume posting. This week proved it at 2.3x the reach with 33% fewer tweets.</li>
+      <li><strong>Embed links in macro tweets.</strong> The top-performing format (macro event + vault positioning) gets the reach but zero clicks. Add a prodigy.fi link directly into these tweets &mdash; at 11.3K followers, URL suppression is negligible.</li>
+      <li><strong>Mix personality formats into the rotation.</strong> The &ldquo;win rate&rdquo; dialogue (2,068 imp) was the 3rd highest tweet and the most distinctive. 1&ndash;2 personality/creative tweets per week alongside the data-driven content keeps the feed from feeling like a terminal.</li>
+      <li><strong>Continue the specific-vault-with-dollar-amounts format.</strong> &ldquo;$362 on 20 ETH&rdquo; (2 clicks) and &ldquo;$430 on $100K&rdquo; (2 clicks) drove the most conversions. These outperform generic &ldquo;earn yield&rdquo; CTAs every time.</li>
+      <li><strong>Reply volume still at 60% &mdash; push toward 40%.</strong> 18 of 30 tweets are replies averaging 19 impressions. Cut to 2 substantive replies per day and reinvest in original content.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Aug 7</td>
+            <td>five weeks ago, three Fed officials voted to hike rates. today the economy printed a loss of 23,000&hellip;</td>
+            <td class="num">2,586</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0.77</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 5</td>
+            <td>for the first time in the history of the chart, the S&amp;P 500 has held above its 200-week average&hellip;</td>
+            <td class="num">2,466</td>
+            <td class="num">7</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">1.78</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 6</td>
+            <td>&lsquo;what&rsquo;s your win rate?&rsquo; &lsquo;on what?&rsquo; &lsquo;trades.&rsquo; &lsquo;I&rsquo;ve got two positions and they both expire Friday.&rsquo;</td>
+            <td class="num">2,068</td>
+            <td class="num">10</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">1.45</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 10</td>
+            <td>BTC ETFs took $853 million last week, their best since April. ether added $245 million, also its bes&hellip;</td>
+            <td class="num">1,505</td>
+            <td class="num">6</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">1.00</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 8</td>
+            <td>every holder has a number they&rsquo;d sell at. prodigy.fi pays you to name it. anywhere else&hellip;</td>
+            <td class="num">907</td>
+            <td class="num">11</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">3.42</td>
+          </tr>
+          <tr>
+            <td>Aug 9</td>
+            <td>if you&rsquo;d sell ETH at $2,000, this vault pays you $362 on 20 ETH to say so now. it settles August 21&hellip;</td>
+            <td class="num">819</td>
+            <td class="num">13</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">5.01</td>
+          </tr>
+          <tr>
+            <td>Aug 4</td>
+            <td>a vault has no liquidation price. it isn&rsquo;t a leveraged position. your deposit is committed through e&hellip;</td>
+            <td class="num">659</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">2.43</td>
+          </tr>
+          <tr>
+            <td>Aug 7</td>
+            <td>a linked price isn&rsquo;t your BTC prediction. it&rsquo;s the settlement line, and it sets your rate. set it cl&hellip;</td>
+            <td class="num">652</td>
+            <td class="num">10</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">2</td>
+            <td class="num">4.91</td>
+          </tr>
+          <tr>
+            <td>Aug 6</td>
+            <td>$66,500 is 2.6% above where BTC is now. payrolls Friday is what decides whether it gets there. $430&hellip;</td>
+            <td class="num">562</td>
+            <td class="num">10</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">4.98</td>
+          </tr>
+          <tr>
+            <td>Aug 5</td>
+            <td>ways to have a price in mind.</td>
+            <td class="num">540</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3.89</td>
+          </tr>
+          <tr>
+            <td>Aug 4</td>
+            <td>prediction markets put the highest odds on BTC closing today between $62,000 and $64,000. analyst fo&hellip;</td>
+            <td class="num">536</td>
+            <td class="num">9</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">4.85</td>
+          </tr>
+          <tr>
+            <td>Aug 10</td>
+            <td>a bond coupon pays you for lending money to an issuer, who owes the principal back on a schedule. st&hellip;</td>
+            <td class="num">405</td>
+            <td class="num">8</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">6.17</td>
+          </tr>
+          <!-- Reply tweets -->
+          <tr>
+            <td>Aug 4</td>
+            <td>@bigjercrypto</td>
+            <td class="num">33</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 5</td>
+            <td>@bigjercrypto</td>
+            <td class="num">30</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 6</td>
+            <td>@bigjercrypto</td>
+            <td class="num">28</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 7</td>
+            <td>@bigjercrypto</td>
+            <td class="num">26</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 8</td>
+            <td>@bigjercrypto</td>
+            <td class="num">24</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 9</td>
+            <td>@poppyduckk</td>
+            <td class="num">22</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 10</td>
+            <td>@poppyduckk</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 4</td>
+            <td>@poppyduckk</td>
+            <td class="num">18</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 5</td>
+            <td>@poppyduckk</td>
+            <td class="num">16</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 6</td>
+            <td>@poppyduckk</td>
+            <td class="num">15</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 7</td>
+            <td>@feisi1117</td>
+            <td class="num">14</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 8</td>
+            <td>@feisi1117</td>
+            <td class="num">13</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 9</td>
+            <td>@feisi1117</td>
+            <td class="num">12</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 10</td>
+            <td>@feisi1117</td>
+            <td class="num">12</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 4</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">11</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 6</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">11</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 8</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">11</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Aug 13, 2026 &middot; ProdigyFi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
