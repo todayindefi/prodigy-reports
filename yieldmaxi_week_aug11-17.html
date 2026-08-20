@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xYield_Maxi Twitter Analytics — Week of Aug 11 – Aug 17, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>0xYield_Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Aug 11 &ndash; Aug 17, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">8</div>
+      <div class="label">Tweets</div>
+      <div class="delta down">&minus;11% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">820</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;41% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">103</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;34% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">38</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;22% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">10.9%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+60% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">1</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;67% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aug 11&ndash;17 (this week)</td>
+            <td class="num">8</td>
+            <td class="num">820</td>
+            <td class="num">103</td>
+            <td class="num">38</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">10.9%</td>
+          </tr>
+          <tr>
+            <td>Aug 4&ndash;10 (last week)</td>
+            <td class="num">9</td>
+            <td class="num">1,394</td>
+            <td class="num">155</td>
+            <td class="num">49</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">6.8%</td>
+          </tr>
+          <tr>
+            <td>Jul 28&ndash;Aug 3 (2 wks ago)</td>
+            <td class="num">10</td>
+            <td class="num">2,822</td>
+            <td class="num">282</td>
+            <td class="num">70</td>
+            <td class="num">13</td>
+            <td class="num">2</td>
+            <td class="num">3</td>
+            <td class="num">7</td>
+            <td class="num">9.2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 8 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 17</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>Harvard held its bitcoin ETF position through Q2. Last quarter they cut 43%. This quarter &mdash; nothing&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">353 impressions</span>
+        <span>2 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 2.27%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 12</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>CPI drops tomorrow, BTC already sliding past $64K This is when prodigy.fi gets interest&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">113 impressions</span>
+        <span>4 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 5.31%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 14</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>Bitcoin&rsquo;s quietest tape since 2019: Range-bound, crowded longs, no conviction either way. Boring for&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">85 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 8.24%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 13</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>Goldman Sachs just paid $2.25B for a firm that builds options-based income products on BTC and ETH&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">65 impressions</span>
+        <span>5 likes</span>
+        <span>1 repost</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 15.38%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 14</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>Figure just tripled quarterly profits. $4.3B in onchain lending volume. All while bitcoin is trading&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">55 impressions</span>
+        <span>4 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 9.09%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 11</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>One of the things I&rsquo;m proudest of is our engineering team @ProdigyFi Always building in the backgrou&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">54 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 11.11%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 11</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>Memecoin trading is fun, until it suddenly isn&rsquo;t. For 99% of people, trading very infrequently, and&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">50 impressions</span>
+        <span>7 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 18.0%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 12</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>prodigy.fi has just launched WBTC vaults on Ethereum mainnet, making it easier than eve&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">45 impressions</span>
+        <span>6 likes</span>
+        <span>0 reposts</span>
+        <span>0 replies</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 17.78%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Engagement rate surged to 10.9% &mdash; the highest in 3 weeks.</strong> Up 60% from last week&rsquo;s 6.8%. The smaller reach this week means the content resonated deeply with the existing audience.</li>
+      <li><strong>Harvard ETF tweet led at 353 impressions.</strong> Institutional conviction narrative continues to drive above-average reach for the founder account. Clean, non-shill content leading the week.</li>
+      <li><strong>Goldman Sachs tweet earned 15.38% ER</strong> &mdash; the second-highest engagement rate of the week. The options-income parallel to Prodigy is an organic, credible product tie-in that audiences responded to.</li>
+      <li><strong>Memecoin tweet hit 18.0% ER with 7 likes.</strong> The strongest engagement of the week on a personal conviction take. Opinionated content from the founder voice consistently drives the highest per-tweet engagement.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Impressions declined for the third consecutive week.</strong> 820 &rarr; 1,394 &rarr; 2,822 over three weeks. The Coldcard/Glamsterdam breakout (week of Jul 28) hasn&rsquo;t been replicated. No tweet this week matched the depth of those research threads.</li>
+      <li><strong>Zero bookmarks and zero replies for the third straight week.</strong> The content is liked but not saved or responded to. No tweet was reference-worthy or conversation-starting enough to break through.</li>
+      <li><strong>URL clicks dropped to 1.</strong> Only the CPI tweet drove a click. The Goldman and Figure tweets &mdash; both strong narratives &mdash; had no links to convert on.</li>
+      <li><strong>Reposts dropped to 4 (from 7, from 13).</strong> Consistent decline in shareability. The content is informative but not &ldquo;I need to share this&rdquo; caliber.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>The account needs another deep research tweet.</strong> Three consecutive weeks of decline since the Coldcard/Glamsterdam breakout. The data is clear: surface-level takes get 50&ndash;100 imp, deep research gets 600&ndash;800+. Find the next complex topic to break down &mdash; EIP-8361 aftermath, the sNUSD depeg mechanics, or the Clarity Act implications.</li>
+      <li><strong>Add links to narrative tweets.</strong> The Goldman tweet (65 imp, 15.38% ER) and Figure tweet (55 imp) had no links. These are exactly the tweets where a prodigy.fi link would feel natural, not forced.</li>
+      <li><strong>Post opinion hooks to break the zero-reply streak.</strong> The memecoin tweet (18.0% ER, 7 likes) proves the audience engages with takes. End tweets with &ldquo;agree or disagree?&rdquo; or a contrarian stance that invites pushback.</li>
+      <li><strong>Cross-pollinate with @ProdigyFi&rsquo;s wBTC launch.</strong> The wBTC announcement (1,855 imp on ProdigyFi) was the week&rsquo;s biggest tweet across both accounts. A QT or follow-up from the founder account would bridge that reach.</li>
+      <li><strong>Consider increasing posting frequency slightly.</strong> 8 tweets in a week means barely more than 1/day. The founder account&rsquo;s best weeks had 9&ndash;10 tweets. Not a major change, but an extra 1&ndash;2 quality posts per week could help arrest the impression decline.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Aug 17</td>
+            <td>Harvard held its bitcoin ETF position through Q2. Last quarter they cut 43%. This quarter &mdash; nothing&hellip;</td>
+            <td class="num">353</td>
+            <td class="num">2</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">2.27</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 12</td>
+            <td>CPI drops tomorrow, BTC already sliding past $64K This is when prodigy.fi gets interest&hellip;</td>
+            <td class="num">113</td>
+            <td class="num">4</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">5.31</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 14</td>
+            <td>Bitcoin&rsquo;s quietest tape since 2019: Range-bound, crowded longs, no conviction either way. Boring for&hellip;</td>
+            <td class="num">85</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">8.24</td>
+          </tr>
+          <tr>
+            <td>Aug 13</td>
+            <td>Goldman Sachs just paid $2.25B for a firm that builds options-based income products on BTC and ETH&hellip;</td>
+            <td class="num">65</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">15.38</td>
+          </tr>
+          <tr>
+            <td>Aug 14</td>
+            <td>Figure just tripled quarterly profits. $4.3B in onchain lending volume. All while bitcoin is trading&hellip;</td>
+            <td class="num">55</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">9.09</td>
+          </tr>
+          <tr>
+            <td>Aug 11</td>
+            <td>One of the things I&rsquo;m proudest of is our engineering team @ProdigyFi Always building in the backgrou&hellip;</td>
+            <td class="num">54</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">11.11</td>
+          </tr>
+          <tr>
+            <td>Aug 11</td>
+            <td>Memecoin trading is fun, until it suddenly isn&rsquo;t. For 99% of people, trading very infrequently, and&hellip;</td>
+            <td class="num">50</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">18.0</td>
+          </tr>
+          <tr>
+            <td>Aug 12</td>
+            <td>prodigy.fi has just launched WBTC vaults on Ethereum mainnet, making it easier than eve&hellip;</td>
+            <td class="num">45</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">17.78</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Aug 20, 2026 &middot; 0xYield_Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
