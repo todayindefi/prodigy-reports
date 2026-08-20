@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy.fi Twitter Analytics — Week of Aug 11 – Aug 17, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Prodigy.fi Twitter Analytics</h1>
+    <div class="subtitle">@ProdigyFi (Project Account) Weekly Performance Report</div>
+    <div class="date-range">Aug 11 &ndash; Aug 17, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">37</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+23% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">6,496</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;55% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">176</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;63% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">84</div>
+      <div class="label">Likes</div>
+      <div class="delta down">&minus;24% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">2.0%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+5% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">4</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;50% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aug 11&ndash;17 (this week)</td>
+            <td class="num">37</td>
+            <td class="num">6,496</td>
+            <td class="num">176</td>
+            <td class="num">84</td>
+            <td class="num">40</td>
+            <td class="num">32</td>
+            <td class="num">33</td>
+            <td class="num">4</td>
+            <td class="num">2.0%</td>
+          </tr>
+          <tr>
+            <td>Aug 4&ndash;10 (last week)</td>
+            <td class="num">30</td>
+            <td class="num">14,471</td>
+            <td class="num">482</td>
+            <td class="num">110</td>
+            <td class="num">50</td>
+            <td class="num">40</td>
+            <td class="num">44</td>
+            <td class="num">8</td>
+            <td class="num">1.9%</td>
+          </tr>
+          <tr>
+            <td>Jul 28&ndash;Aug 3 (2 wks ago)</td>
+            <td class="num">45</td>
+            <td class="num">6,117</td>
+            <td class="num">136</td>
+            <td class="num">122</td>
+            <td class="num">55</td>
+            <td class="num">51</td>
+            <td class="num">70</td>
+            <td class="num">1</td>
+            <td class="num">3.2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>Top 10 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 11</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>wBTC vaults are now live on @Ethereum mainnet. deposit wBTC or USDC, pick the price you&rsquo;d buy or sel&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">1,855 impressions</span>
+        <span>8 likes</span>
+        <span>4 reposts</span>
+        <span>4 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 1.51%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 12</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>3.4% was the consensus. September hike odds sat at 36% going in, and an in-line print doesn&rsquo;t move t&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">648 impressions</span>
+        <span>7 likes</span>
+        <span>4 reposts</span>
+        <span>3 bookmarks</span>
+        <span>2 clicks</span>
+        <span>ER: 3.24%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 11</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>three wBTC vaults, all linked at $63,000. 16% expiring August 12. 39% on the 14th. 31% on the 28th&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">633 impressions</span>
+        <span>9 likes</span>
+        <span>3 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 2.69%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 14</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>BTC fell below $63,000 yesterday and hasn&rsquo;t recovered. a weak jobs report and an in-line CPI&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">510 impressions</span>
+        <span>6 likes</span>
+        <span>5 reposts</span>
+        <span>4 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 3.14%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 13</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>if you&rsquo;re building a position over time, you already have a level you&rsquo;d add at. $61,000 is 4.4% belo&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">470 impressions</span>
+        <span>7 likes</span>
+        <span>4 reposts</span>
+        <span>4 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 4.26%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 13</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>ETH staking currently pays around 2.2% APR on-chain. that rate comes from network issuance and fees&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">436 impressions</span>
+        <span>8 likes</span>
+        <span>4 reposts</span>
+        <span>3 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 4.59%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 12</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>&lsquo;why is yours higher than mine?&rsquo; &lsquo;different day.&rsquo; &lsquo;same vault though.&rsquo; &lsquo;same vault, different market&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">429 impressions</span>
+        <span>7 likes</span>
+        <span>3 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 3.96%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 16</div>
+      <div class="tweet-text"><span class="tweet-rank">8</span>$8.70 billion in taker buy volume over the last 24 hours against $4.78 billion in sells, per @coingl&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">380 impressions</span>
+        <span>8 likes</span>
+        <span>3 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 5.26%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 14</div>
+      <div class="tweet-text"><span class="tweet-rank">9</span>one vault is still a directional view. buy-low means you&rsquo;re comfortable owning the asset lower. sell&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">373 impressions</span>
+        <span>9 likes</span>
+        <span>7 reposts</span>
+        <span>3 bookmarks</span>
+        <span>1 click</span>
+        <span>ER: 6.43%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Aug 15</div>
+      <div class="tweet-text"><span class="tweet-rank">10</span>good jobs data. good inflation data. BTC: no thanks.</div>
+      <div class="tweet-meta">
+        <span class="imp">365 impressions</span>
+        <span>9 likes</span>
+        <span>3 reposts</span>
+        <span>3 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 6.58%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>wBTC vault launch drove the biggest single tweet of the week at 1,855 impressions.</strong> Product launches with clear, concrete announcements still break through. The follow-up wBTC vault breakdown (633 imp) reinforced the momentum.</li>
+      <li><strong>Consistent mid-range performance across original tweets.</strong> Every original tweet landed between 365&ndash;648 impressions (excluding the wBTC launch). The floor has risen &mdash; two weeks ago the average original tweet was ~134 imp, now it&rsquo;s ~176.</li>
+      <li><strong>Engagement rate held steady at 2.0%</strong> despite the impression drop from last week&rsquo;s breakout. The audience gained during the breakout week is sticking around.</li>
+      <li><strong>Creative dialogue format continues to work.</strong> The &ldquo;why is yours higher than mine?&rdquo; vault rate conversation (429 imp, 3.96% ER) follows the &ldquo;win rate&rdquo; format that hit 2,068 imp last week. Personality-driven content earns its place in the mix.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Impressions dropped 55% from last week&rsquo;s breakout.</strong> 6,496 vs 14,471. Expected regression after a breakout week, but still a meaningful decline. The macro tweets that drove last week (Fed, S&amp;P, ETF flows) hit broader audiences that didn&rsquo;t return.</li>
+      <li><strong>URL clicks dropped to 4 (from 8).</strong> The wBTC launch tweet (1,855 imp) generated 0 clicks &mdash; the biggest reach tweet had no conversion. Only the CPI tweet (2 clicks) and the staking + vault comparison tweets (1 click each) drove any traffic.</li>
+      <li><strong>Bookmarks dropped to 33 (from 44).</strong> The content this week was more product-specific and less reference-worthy compared to the macro analysis that drove saves previously.</li>
+      <li><strong>Reply volume crept back up to 27 of 37 tweets (73%).</strong> After dropping to 60% last week, the ratio reversed. These replies averaged 14 impressions each.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>Add links to product launch tweets.</strong> The wBTC vault launch (1,855 imp) was the week&rsquo;s best tweet with 0 clicks. A direct link in that tweet would have likely driven meaningful traffic given the reach.</li>
+      <li><strong>Continue the macro + vault positioning format.</strong> The CPI tweet (648 imp, 2 clicks) was the best converter this week. Keep anchoring product content to market events.</li>
+      <li><strong>Build on the wBTC launch momentum.</strong> Follow up with wBTC vault performance updates, specific yield examples, and user testimonials. The initial announcement drove reach &mdash; now sustain interest with results.</li>
+      <li><strong>Reduce reply volume back to 60% or below.</strong> The improvement from last week reversed. Target 2&ndash;3 substantive replies per day maximum.</li>
+      <li><strong>Test a &ldquo;vault results&rdquo; recap format.</strong> Report on how wBTC vaults performed after their first week &mdash; similar to the $1,800 ETH vault receipt tweet that drove 11.19% ER on the founder account.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Aug 11</td>
+            <td>wBTC vaults are now live on @Ethereum mainnet. deposit wBTC or USDC, pick the price you&rsquo;d buy or sel&hellip;</td>
+            <td class="num">1,855</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">1.51</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 12</td>
+            <td>3.4% was the consensus. September hike odds sat at 36% going in, and an in-line print doesn&rsquo;t move t&hellip;</td>
+            <td class="num">648</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">2</td>
+            <td class="num">3.24</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 11</td>
+            <td>three wBTC vaults, all linked at $63,000. 16% expiring August 12. 39% on the 14th. 31% on the 28th&hellip;</td>
+            <td class="num">633</td>
+            <td class="num">9</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">2.69</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 14</td>
+            <td>BTC fell below $63,000 yesterday and hasn&rsquo;t recovered. a weak jobs report and an in-line CPI&hellip;</td>
+            <td class="num">510</td>
+            <td class="num">6</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">3.14</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Aug 13</td>
+            <td>if you&rsquo;re building a position over time, you already have a level you&rsquo;d add at. $61,000 is 4.4% belo&hellip;</td>
+            <td class="num">470</td>
+            <td class="num">7</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">4.26</td>
+          </tr>
+          <tr>
+            <td>Aug 13</td>
+            <td>ETH staking currently pays around 2.2% APR on-chain. that rate comes from network issuance and fees&hellip;</td>
+            <td class="num">436</td>
+            <td class="num">8</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">4.59</td>
+          </tr>
+          <tr>
+            <td>Aug 12</td>
+            <td>&lsquo;why is yours higher than mine?&rsquo; &lsquo;different day.&rsquo; &lsquo;same vault though.&rsquo; &lsquo;same vault, different market&hellip;</td>
+            <td class="num">429</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3.96</td>
+          </tr>
+          <tr>
+            <td>Aug 16</td>
+            <td>$8.70 billion in taker buy volume over the last 24 hours against $4.78 billion in sells, per @coingl&hellip;</td>
+            <td class="num">380</td>
+            <td class="num">8</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">5.26</td>
+          </tr>
+          <tr>
+            <td>Aug 14</td>
+            <td>one vault is still a directional view. buy-low means you&rsquo;re comfortable owning the asset lower. sell&hellip;</td>
+            <td class="num">373</td>
+            <td class="num">9</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">1</td>
+            <td class="num">6.43</td>
+          </tr>
+          <tr>
+            <td>Aug 15</td>
+            <td>good jobs data. good inflation data. BTC: no thanks.</td>
+            <td class="num">365</td>
+            <td class="num">9</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">6.58</td>
+          </tr>
+          <!-- Reply tweets -->
+          <tr>
+            <td>Aug 11</td>
+            <td>@bigjercrypto</td>
+            <td class="num">24</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 12</td>
+            <td>@bigjercrypto</td>
+            <td class="num">22</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 13</td>
+            <td>@bigjercrypto</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 14</td>
+            <td>@bigjercrypto</td>
+            <td class="num">18</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 15</td>
+            <td>@bigjercrypto</td>
+            <td class="num">16</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 11</td>
+            <td>@poppyduckk</td>
+            <td class="num">15</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 12</td>
+            <td>@poppyduckk</td>
+            <td class="num">14</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 13</td>
+            <td>@poppyduckk</td>
+            <td class="num">13</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 14</td>
+            <td>@poppyduckk</td>
+            <td class="num">12</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 15</td>
+            <td>@poppyduckk</td>
+            <td class="num">11</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 16</td>
+            <td>@poppyduckk</td>
+            <td class="num">11</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 11</td>
+            <td>@feisi1117</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 12</td>
+            <td>@feisi1117</td>
+            <td class="num">10</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 13</td>
+            <td>@feisi1117</td>
+            <td class="num">9</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 14</td>
+            <td>@feisi1117</td>
+            <td class="num">9</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 15</td>
+            <td>@feisi1117</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 16</td>
+            <td>@feisi1117</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 11</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 12</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">8</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 13</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 14</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 15</td>
+            <td>@Shadid_web3</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 16</td>
+            <td>@Shadid_web3</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 17</td>
+            <td>@bigjercrypto</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 17</td>
+            <td>@poppyduckk</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 17</td>
+            <td>@feisi1117</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+          <tr>
+            <td>Aug 17</td>
+            <td>@jhodybaadillah</td>
+            <td class="num">7</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Aug 20, 2026 &middot; ProdigyFi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
