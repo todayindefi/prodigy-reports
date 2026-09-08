@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0xYield_Maxi Twitter Analytics — Week of Sep 1 – Sep 7, 2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 1.75rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+  .header .date-range {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 20px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .kpi .value { font-size: 1.6rem; font-weight: 700; }
+  .kpi .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .kpi .delta { font-size: 0.75rem; margin-top: 0.25rem; font-weight: 500; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.down { color: var(--red); }
+  .kpi .delta.flat { color: var(--yellow); }
+  section { margin-bottom: 2rem; }
+  section h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .highlight-row td { background: rgba(63,185,80,0.06); }
+  .wow-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .wow-table tr:first-child td { background: rgba(88,166,255,0.06); }
+  .insight-list { list-style: none; padding: 0; }
+  .insight-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .insight-list li strong { color: var(--accent); }
+  .insight-list.green li { border-left: 3px solid var(--green); }
+  .insight-list.yellow li { border-left: 3px solid var(--yellow); }
+  .insight-list.blue li { border-left: 3px solid var(--accent); }
+  .tweet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 0.65rem;
+  }
+  .tweet-card .tweet-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .tweet-card .tweet-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .tweet-card .tweet-meta span { white-space: nowrap; }
+  .tweet-card .tweet-meta .imp { color: var(--accent); font-weight: 600; }
+  .tweet-rank {
+    display: inline-block;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    line-height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .tweet-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+  .footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>0xYield_Maxi Twitter Analytics</h1>
+    <div class="subtitle">@0xYield_Maxi (Founder Account) Weekly Performance Report</div>
+    <div class="date-range">Sep 1 &ndash; Sep 7, 2026</div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">7</div>
+      <div class="label">Tweets</div>
+      <div class="delta up">+40% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">769</div>
+      <div class="label">Impressions</div>
+      <div class="delta down">&minus;60% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">110</div>
+      <div class="label">Avg Impressions</div>
+      <div class="delta down">&minus;71% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">41</div>
+      <div class="label">Likes</div>
+      <div class="delta up">+32% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">9.0%</div>
+      <div class="label">Avg Eng. Rate</div>
+      <div class="delta up">+13% vs last wk</div>
+    </div>
+    <div class="kpi">
+      <div class="value">0</div>
+      <div class="label">URL Clicks</div>
+      <div class="delta down">&minus;100% vs last wk</div>
+    </div>
+  </div>
+
+  <!-- Week-over-Week Table -->
+  <section>
+    <h2>Week-over-Week Comparison</h2>
+    <div class="table-wrap">
+      <table class="wow-table">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th class="num">Tweets</th>
+            <th class="num">Total Imp.</th>
+            <th class="num">Avg Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bookmarks</th>
+            <th class="num">Clicks</th>
+            <th class="num">Avg ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sep 1&ndash;7 (this week)</td>
+            <td class="num">7</td>
+            <td class="num">769</td>
+            <td class="num">110</td>
+            <td class="num">41</td>
+            <td class="num">9</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">9.0%</td>
+          </tr>
+          <tr>
+            <td>Aug 25&ndash;31 (last week)</td>
+            <td class="num">5</td>
+            <td class="num">1,913</td>
+            <td class="num">383</td>
+            <td class="num">31</td>
+            <td class="num">6</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">4</td>
+            <td class="num">8.0%</td>
+          </tr>
+          <tr>
+            <td>Aug 18&ndash;24 (2 wks ago)</td>
+            <td class="num">9</td>
+            <td class="num">1,920</td>
+            <td class="num">213</td>
+            <td class="num">57</td>
+            <td class="num">8</td>
+            <td class="num">5</td>
+            <td class="num">1</td>
+            <td class="num">6</td>
+            <td class="num">10.8%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Followers -->
+  <section>
+    <h2>Followers</h2>
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+      <div class="kpi">
+        <div class="value">599</div>
+        <div class="label">Followers</div>
+        <div class="delta down">&minus;2 vs last wk (601)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Tweets -->
+  <section>
+    <h2>All 7 Tweets by Impressions</h2>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Sep 2</div>
+      <div class="tweet-text"><span class="tweet-rank">1</span>BTC is near $77.5K. ETH is near $2.4K. But today&rsquo;s small selloff isn&rsquo;t really a crypto story. Oil pushed above $95&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">190 impressions</span>
+        <span>6 likes</span>
+        <span>0 reposts</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 5.26%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Sep 3</div>
+      <div class="tweet-text"><span class="tweet-rank">2</span>BTC pulled back from $81K to $77K as iran tensions rise again. If you&rsquo;d buy BTC at $74-76K or ETH at $2.3-2.4k&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">131 impressions</span>
+        <span>8 likes</span>
+        <span>1 repost</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 9.16%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Sep 3</div>
+      <div class="tweet-text"><span class="tweet-rank">3</span>We just went live on HyperEVM HYPE holders can now run Prodigy vaults for the first time &mdash; set a target&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">128 impressions</span>
+        <span>5 likes</span>
+        <span>0 reposts</span>
+        <span>1 bookmark</span>
+        <span>0 clicks</span>
+        <span>ER: 6.25%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Sep 4</div>
+      <div class="tweet-text"><span class="tweet-rank">4</span>HYPE is the first new asset we&rsquo;ve added to Prodigy vaults this year. Here&rsquo;s how it works: Deposit HYPE. Set a&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">108 impressions</span>
+        <span>7 likes</span>
+        <span>3 reposts</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 12.04%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Sep 2</div>
+      <div class="tweet-text"><span class="tweet-rank">5</span>These are the markets where I prefer getting paid to wait instead of forcing a directional trade&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">101 impressions</span>
+        <span>6 likes</span>
+        <span>1 repost</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 10.89%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Sep 7</div>
+      <div class="tweet-text"><span class="tweet-rank">6</span>Crypto projects bought back $638M of their own tokens in 2026. Hyperliquid alone accounts for nearly 90%&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">59 impressions</span>
+        <span>5 likes</span>
+        <span>2 reposts</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 11.86%</span>
+      </div>
+    </div>
+
+    <div class="tweet-card">
+      <div class="tweet-date">Sep 1</div>
+      <div class="tweet-text"><span class="tweet-rank">7</span>Trump&rsquo;s teleprompter operator has been found illegally using insider information and fined $172,539&hellip;</div>
+      <div class="tweet-meta">
+        <span class="imp">52 impressions</span>
+        <span>4 likes</span>
+        <span>0 reposts</span>
+        <span>0 bookmarks</span>
+        <span>0 clicks</span>
+        <span>ER: 7.69%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What went well -->
+  <section>
+    <h2>What Went Well</h2>
+    <ul class="insight-list green">
+      <li><strong>Posting frequency improved to 7 tweets (from 5 last week).</strong> Getting closer to the 9&ndash;10/week target.</li>
+      <li><strong>Likes surged 32% to 41 (from 31).</strong> Best likes count in 3 weeks despite the impressions drop. The audience that did see the tweets engaged at a higher rate.</li>
+      <li><strong>Avg engagement rate improved to 9.0% (from 8.0%).</strong> The HYPE vault explainer hit 12.04% ER &mdash; highest single-tweet ER in weeks. The buyback thread hit 11.86%.</li>
+      <li><strong>The vault CTA tweet (131 imp, 9.16% ER) maintained the successful format from last week</strong> &mdash; direct market context + specific price levels + clear link.</li>
+      <li><strong>The HyperEVM QT/announcement (128 imp, 1 bookmark) successfully amplified the @ProdigyFi launch.</strong> Cross-account strategy working as intended.</li>
+    </ul>
+  </section>
+
+  <!-- What could be improved -->
+  <section>
+    <h2>Areas for Improvement</h2>
+    <ul class="insight-list yellow">
+      <li><strong>Total impressions dropped 60% to 769 &mdash; worst week in the dataset.</strong> No tweet broke 200 imp. Last week had a 654 imp Morpho thread; this week&rsquo;s best was 190 imp.</li>
+      <li><strong>Zero URL clicks (from 4 last week).</strong> Despite multiple tweets containing prodigy.fi links, none converted to clicks.</li>
+      <li><strong>Zero bookmarks across 7 tweets (from 2 last week).</strong> The educational content (HYPE vault explainer, buyback thread) that should be bookmark-worthy wasn&rsquo;t saved.</li>
+      <li><strong>The buyback thread (59 imp) posted on Sunday and got the lowest impressions.</strong> Reinforces that posting deep content on weekends kills reach.</li>
+      <li><strong>The Trump teleprompter tweet (52 imp) was the lowest performer.</strong> Humorous/political angle doesn&rsquo;t fit the account&rsquo;s proven format of deep research + market commentary.</li>
+      <li><strong>Avg impressions dropped 71% to 110 &mdash; the lowest since tracking began.</strong> Even removing the Sunday tweet, avg is still only 127.</li>
+      <li><strong>Followers declined again to 599 (from 601).</strong> Now below 600 for the first time since tracking began in April.</li>
+    </ul>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <h2>Recommendations for Next Week</h2>
+    <ul class="insight-list blue">
+      <li><strong>This week was a content distribution problem, not a quality problem.</strong> The HYPE explainer (12.04% ER) and buyback thread (11.86% ER) had strong engagement but no reach. The algorithm isn&rsquo;t surfacing the content. Focus on hooks and first lines that grab attention.</li>
+      <li><strong>Post deep threads Tue&ndash;Thu only.</strong> The buyback thread (Sunday, 59 imp) would likely have done 400+ on a Wednesday based on historical patterns. Timing is killing otherwise good content.</li>
+      <li><strong>Drop the humor/political tweet format.</strong> The Trump teleprompter tweet (52 imp, 7.69% ER) was the worst performer and doesn&rsquo;t match the account&rsquo;s brand. Stick to market commentary, research threads, and vault explainers.</li>
+      <li><strong>Reverse the follower decline.</strong> Now below 600 for the first time. Test engagement-driving formats: questions, polls, lists of accounts to follow (the Aug 24 &ldquo;follow these DeFi accounts&rdquo; tweet got 327 imp and 15.6% ER).</li>
+      <li><strong>Increase volume to 9&ndash;10 tweets while maintaining the market commentary + educational thread mix.</strong> The gap between 7 tweets and 10 tweets is significant for total reach at this account size.</li>
+    </ul>
+  </section>
+
+  <!-- All Tweets Table -->
+  <section>
+    <h2>All Tweets This Week</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Tweet</th>
+            <th class="num">Imp.</th>
+            <th class="num">Likes</th>
+            <th class="num">Reposts</th>
+            <th class="num">Replies</th>
+            <th class="num">Bkmrks</th>
+            <th class="num">Clicks</th>
+            <th class="num">ER%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Sep 2</td>
+            <td>BTC is near $77.5K. ETH is near $2.4K. But today&rsquo;s small selloff isn&rsquo;t really a crypto story&hellip;</td>
+            <td class="num">190</td>
+            <td class="num">6</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">5.26</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Sep 3</td>
+            <td>BTC pulled back from $81K to $77K as iran tensions rise again. If you&rsquo;d buy BTC at $74-76K&hellip;</td>
+            <td class="num">131</td>
+            <td class="num">8</td>
+            <td class="num">1</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">9.16</td>
+          </tr>
+          <tr>
+            <td>Sep 3</td>
+            <td>We just went live on HyperEVM HYPE holders can now run Prodigy vaults for the first time&hellip;</td>
+            <td class="num">128</td>
+            <td class="num">5</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">6.25</td>
+          </tr>
+          <tr>
+            <td>Sep 4</td>
+            <td>HYPE is the first new asset we&rsquo;ve added to Prodigy vaults this year. Here&rsquo;s how it works&hellip;</td>
+            <td class="num">108</td>
+            <td class="num">7</td>
+            <td class="num">3</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">12.04</td>
+          </tr>
+          <tr>
+            <td>Sep 2</td>
+            <td>These are the markets where I prefer getting paid to wait instead of forcing a directional trade&hellip;</td>
+            <td class="num">101</td>
+            <td class="num">6</td>
+            <td class="num">1</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">10.89</td>
+          </tr>
+          <tr>
+            <td>Sep 7</td>
+            <td>Crypto projects bought back $638M of their own tokens in 2026. Hyperliquid alone accounts for&hellip;</td>
+            <td class="num">59</td>
+            <td class="num">5</td>
+            <td class="num">2</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">11.86</td>
+          </tr>
+          <tr>
+            <td>Sep 1</td>
+            <td>Trump&rsquo;s teleprompter operator has been found illegally using insider information and fined&hellip;</td>
+            <td class="num">52</td>
+            <td class="num">4</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num">7.69</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Generated Sep 8, 2026 &middot; 0xYield_Maxi Marketing Analytics
+  </div>
+
+</div>
+</body>
+</html>
